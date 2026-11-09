@@ -1,0 +1,48 @@
+{
+  "clientId": "",
+  "adminEmails": [
+    "infra@sannamchon.co.kr"
+  ],
+  "divisions": {
+    "PROD": {
+      "label": "생산본부",
+      "sheetId": "1vIcA4x-xDg5cL-izM_If12m38RsFpzyUwT-dkMdKEM8",
+      "mode": "gl",
+      "rate": 0.5,
+      "laborCodes": [
+        "5039",
+        "5079",
+        "5100",
+        "5109"
+      ]
+    },
+    "ONLINE": {
+      "label": "온라인본부",
+      "sheetId": "1IoHfb_B2DHKfamkfKvZMgU9Viy5GTiPrQYedmMHikCQ",
+      "mode": "ch",
+      "channelNames": {
+        "D2C": "자사몰",
+        "COUPANG": "쿠팡(윙 포함)",
+        "KURLY": "컬리",
+        "BULK_ETC": "대량/기타(네이버 포함)",
+        "ONLINE_COMMON": "온라인 공통(미배부)"
+      }
+    },
+    "MGMT": {
+      "label": "경영지원본부",
+      "sheetId": "1RMLHrzTs4kIzX2Jhwj-6vklZRT4_cfBqenSFq69ozrs",
+      "mode": "gl",
+      "rate": 0.5,
+      "laborPrefix": [
+        "직원급여",
+        "퇴직연금"
+      ]
+    }
+  },
+  "periods": [
+    "25Q3",
+    "25Q4",
+    "26H1",
+    "26Q3"
+  ]
+}
