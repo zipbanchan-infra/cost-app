@@ -91,7 +91,7 @@
   function listHtml(s, cfg) {
     var h = '<div class="card scroll"><b>전체 ' + (cfg.mode === 'gl' ? '계정' : '채널') + '</b><table><tr><th>' + (cfg.mode === 'gl' ? '계정' : '채널') + '</th><th>이번 합</th><th>비교 합</th><th>이번 %</th><th>비교 %</th></tr>';
     s.rows.forEach(function (r) { h += '<tr class="click" data-a="' + esc(r.code) + '"><td>' + esc(r.code + ' ' + r.name) + (r.labor ? '<span class="tag">인건비</span>' : '') + '</td><td>' + f0(r.cur) + '</td><td>' + f0(r.prev) + '</td><td>' + f2(r.curRatio) + '</td><td>' + f2(r.prevRatio) + '</td></tr>'; });
-    return h + '</table></div>';
+    return h + '</table>' + (cfg.mode === 'gl' ? '' : '<div class="mut" style="margin-top:6px">채널의 이번 %·비교 %는 그 채널 자기 매출 대비예요. 채널별 %를 더해도 위 헤드라인의 매출 대비(전체 매출 기준)와 같지 않아요.</div>') + '</div>';
   }
   function heatHtml(d, cfg) {
     var H = CostCalc.heat(d, cfg, ST.mode), mx = 0;
@@ -128,7 +128,7 @@
   function onlineVendorsHtml(d, cfg) {
     var accs = d.업체계정 || []; if (!accs.length) return '';
     var code = ST.ova || String(accs[0].account_code), v = CostCalc.vendors(d, code, ST.cur, ST.prev, cfg);
-    var h = '<div class="card scroll"><b>업체(계정 기준)</b> <span class="mut">온라인 거래처 줄은 채널이 아니라 계정으로 나뉘어 있어서 계정을 골라 봐요. 25년 거래처는 이카운트 원장이 오면 보여요.</span><div class="row" style="margin:8px 0"><select id="ova">' + accs.map(function (a) { return '<option value="' + esc(a.account_code) + '"' + (String(a.account_code) === code ? ' selected' : '') + '>' + esc(a.account_code + ' ' + a.name) + '</option>'; }).join('') + '</select></div>';
+    var h = '<div class="card scroll"><b>업체(계정 기준)</b> <span class="mut">온라인 거래처 줄은 채널이 아니라 계정으로 나뉘어 있어서 계정을 골라 봐요. 25년 거래처는 이카운트 원장이 오면 보여요. 원장 줄이 있는 계정만 나오고 원장에만 있는 금액도 있어서, 업체 합계는 헤드라인 비용 합과 달라요.</span><div class="row" style="margin:8px 0"><select id="ova">' + accs.map(function (a) { return '<option value="' + esc(a.account_code) + '"' + (String(a.account_code) === code ? ' selected' : '') + '>' + esc(a.account_code + ' ' + a.name) + '</option>'; }).join('') + '</select></div>';
     if (!v.length) return h + '<div class="mut">이 계정은 거래처 자료가 없어요.</div></div>';
     h += '<table><tr><th>업체</th><th>이번 합</th><th>비교 합</th><th>증감</th><th class="l">출처</th><th class="l">성격</th></tr>';
     v.slice(0, 100).forEach(function (x) { h += '<tr><td>' + esc(x.name) + '</td><td>' + f0(x.cur) + '</td><td>' + f0(x.prev) + '</td><td>' + sgn(x.diff, f0(x.diff)) + '</td><td class="l">' + esc(x.src) + '</td><td class="l">' + esc(x.nature) + '</td></tr>'; });
@@ -154,7 +154,7 @@
   function planRows(k) { return (S[k].data.P_계획 || []).slice(1).map(function (r, i) { return { row: i + 2, v: r }; }).filter(function (x) { return x.v[0] !== '' && x.v[0] != null && !x.v[14]; }); }
   function planHtml(k, s) {
     var rows = planRows(k), pre = ST.pre || {}, opts = s.rows.map(function (r) { return '<option value="' + esc(r.code) + '"' + (r.code === pre.code ? ' selected' : '') + '>' + esc(r.code + ' ' + r.name) + '</option>'; }).join('');
-    var h = '<div class="card scroll" id="plan"><b>절감계획</b> <span class="mut">목표는 월 단위예요. 금액을 넣으면 비율이, 비율을 넣으면 금액이 채워져요.</span><table><tr><th>코드</th><th class="l">대상</th><th>현재 월평균</th><th>목표 월 금액</th><th>목표 %</th><th class="l">방법</th><th class="l">담당</th><th class="l">기한</th><th class="l">상태</th><th></th></tr>';
+    var h = '<div class="card scroll" id="plan"><b>절감계획</b> <span class="mut">목표는 월 단위예요. 금액을 넣으면 비율이, 비율을 넣으면 금액이 채워져요. 현재 월평균은 계획을 쓸 때 저장한 값이라 위 기간을 바꿔도 그대로예요.</span><table><tr><th>코드</th><th class="l">대상</th><th>현재 월평균</th><th>목표 월 금액</th><th>목표 %</th><th class="l">방법</th><th class="l">담당</th><th class="l">기한</th><th class="l">상태</th><th></th></tr>';
     rows.forEach(function (x) {
       var v = x.v;
       if (ST.edit === x.row) { h += '<tr><td>' + esc(v[2]) + '</td><td class="l"><input id="et" value="' + esc(v[3]) + '"></td><td>' + f0(v[4]) + '</td><td><input id="em" type="number" min="0" value="' + esc(v[5]) + '"></td><td><input id="er" type="number" min="0" max="100" step="0.01" value="' + esc(v[6] === '' ? '' : f2(v[6])) + '"></td><td class="l"><input id="ew" value="' + esc(v[7]) + '"></td><td class="l"><input id="eo" value="' + esc(v[8]) + '"></td><td class="l"><input id="ed" type="date" value="' + esc(v[9]) + '"></td><td class="l">' + esc(v[10]) + '</td><td><button class="pri" data-esave="' + x.row + '">저장</button> <button data-ecancel="1">취소</button></td></tr>'; return; }
