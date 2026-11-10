@@ -50,7 +50,7 @@ function introHtml(){const C=CC();const BL=V5.basisLabel()||'매출';return `<se
 function step1(){const I=issues();const tm=isP()?prodMonthly():oMonthly(view(),'ALL',null,true);const tc=tots(tm);const x=cmpM(tm);
  const NDI=issues(true).filter(i=>i.nd);const N=5;const shown=st.more?I:I.slice(0,N);const pi=st.div==='prod'?priceIssue():null;const plans=V5.ST.plans.length;
  const totUp=amtMode()?x.d>0:(x.pp!=null&&x.pp>0);
- const K=[kpi(`${divName()} 비용${amtMode()?' · 월평균':' · '+esc(V5.basisLabel())+' 대비'}`,amtMode()?man(tc['26Q3']/3):vPb(tc['26Q3'],'26Q3'),`<span class="${x.nd?'':totUp?'up':'dn'}">${dPb(tm)}</span> ${CC().s}`,'data-view="hm"',sparkSvg(series(tm),totUp)),
+ const K=[kpi(`${divName()} 비용${amtMode()?' · 월평균':' · '+esc(V5.basisLabel())+' 대비'}`,amtMode()?man(st.cmp==='m10'?tm['2610']||0:tc['26Q3']/3):st.cmp==='m10'?V5.vYm(tm['2610']||0,'2610'):vPb(tc['26Q3'],'26Q3'),`<span class="${x.nd?'':totUp?'up':'dn'}">${dPb(tm)}</span> ${CC().s}`,'data-view="hm"',sparkSvg(series(tm),totUp)),
   kpi('늘어난 비용',`${I.length}개`,I.length?`1위 ${esc(I[0].title)}`:'늘어난 비용이 없어요',I.length?`data-issue="${esc(I[0].id)}"`:'disabled'),
   pi?kpi('원재료 단가',pi.H.its.length?'평균 '+pctS(pi.H.avg):'-',`+15% 이상 ${pi.n15}개`,'data-price="1"'):'',
   kpi('절감 계획',`${plans}건`,plans?'저장한 계획 보기':'줄 없음','data-step="4"')].join('');
