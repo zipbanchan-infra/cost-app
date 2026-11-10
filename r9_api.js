@@ -104,11 +104,15 @@
 
     // 시트 접근 성공 = 그 본부 허용(권한은 시트 공유가 정한다)
     function allowed() {
-      return once('allowed', function () {
-        return Promise.all(DIVS.map(function (d) { return sheets.titles(sid(d)).then(function (t) { return { d: d, t: t }; }, function () { return null; }); })).then(function (r) {
-          var a = [], titles = {}; r.forEach(function (x) { if (x) { a.push(x.d); titles[x.d] = x.t; } }); memo.titles = titles; return a.sort();
+      if (memo.allowedP) return memo.allowedP;
+      var pr = Promise.all(DIVS.map(function (d) {
+        return sheets.titles(sid(d)).then(function (t) { return { d: d, t: t }; }, function (e) {
+          if (e && (e.status === 403 || e.status === 404)) return null;   // 공유받지 못한 본부 = 권한 없음
+          throw e;                                                       // 일시 오류(429·5xx·네트워크)는 권한 없음으로 보지 않는다
         });
-      });
+      })).then(function (r) { var a = [], titles = {}; r.forEach(function (x) { if (x) { a.push(x.d); titles[x.d] = x.t; } }); memo.titles = titles; return a.sort(); });
+      memo.allowedP = pr; pr.catch(function () { memo.allowedP = null; });   // 실패는 캐시하지 않아 다음 호출에서 다시 시도
+      return pr;
     }
     function titlesOf(d) { return allowed().then(function () { return memo.titles[d] || []; }); }
     function ensureTab(d, title, header) {
