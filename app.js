@@ -65,6 +65,8 @@
       '<label>보기 <select id="mode"><option' + (ST.mode === '금액' ? ' selected' : '') + '>금액</option><option' + (ST.mode === '비율' ? ' selected' : '') + '>비율</option></select></label>' +
       '<span class="mut">월평균 비교 (이번 ' + s.nCur + '개월 / 비교 ' + s.nPrev + '개월)</span></div>';
     if (ST.cur === CFG.provisional || ST.prev === CFG.provisional) h += '<div class="card warn"><b>26.10 가마감</b> 회계파트 마감 확정 전 값이에요. 확정되면 바뀔 수 있어요.</div>';
+    if (ST.cur === '25Q4' || ST.prev === '25Q4') h += '<div class="card mut">25년 4분기(25Q4)는 부서 단위 자료만 있어서 업체·품목은 보여 드리지 못해요. 이카운트 원장이 오면 보여요.</div>';
+    if (ST.warn) h += '<div class="card warn">' + esc(ST.warn) + '</div>';
     var t = s.totals, dm = t.cur / s.nCur - t.prev / s.nPrev, dn = t.curNoLabor / s.nCur - t.prevNoLabor / s.nPrev;
     h += '<div class="card k"><div>비용 합(이번)<b>' + f0(t.cur) + '원</b></div><div>비용 합(비교)<b>' + f0(t.prev) + '원</b></div>' +
       '<div>매출 대비(이번)<b>' + f2(t.curRatio) + '%</b></div><div>매출 대비(비교)<b>' + f2(t.prevRatio) + '%</b></div>' +
@@ -76,10 +78,13 @@
     h += '<div class="card row"><button class="tab' + (ST.view === 'list' ? ' on' : '') + '" data-v="list">목록</button><button class="tab' + (ST.view === 'heat' ? ' on' : '') + '" data-v="heat">히트맵(월별)</button></div>';
     h += ST.view === 'heat' ? heatHtml(d, cfg) : listHtml(s, cfg);
     if (ST.acct) h += detail(k, s, cfg);
+    if (cfg.mode === 'ch') h += onlineVendorsHtml(d, cfg);
     if (k === 'PROD') h += itemsHtml(d, cfg);
     if (k === 'MGMT') h += commonHtml(k, d, s);
     h += planHtml(k, s);
-    h += '<div class="foot mut">' + (k === 'PROD' ? '금액: 회계집계표 마감 · 업체: 이카운트 원장·회계집계표 거래처 줄 · 자재: 구매현황' : k === 'MGMT' ? '금액: 회계집계표 마감(부서 SN_01 판관비) · 공통비 입력은 이 시트의 P_공통비에 저장' : '금액: 독립채산제 월 탭 채널 직접비') + ' · 분모: ' + (cfg.mode === 'gl' ? '생산매출(권장판매매출 x 이전가율 50%)' : '온라인 매출') + ' · 비교: 월평균 · 25년 거래처·품목은 이카운트 원장이 오면 보여요 · 숫자는 3294bcb(2609 마감) 기준값과 대조했어요</div>';
+    var nt = (d.안내 || []).slice(1).map(function (x) { return esc(x[0]); }).join('<br>');
+    if (nt) h += '<div class="card mut">' + nt + '</div>';
+    h += '<div class="foot mut">' + (k === 'PROD' ? '금액: 회계집계표 마감 · 업체: 이카운트 원장·회계집계표 거래처 줄 · 자재: 구매현황' : k === 'MGMT' ? '금액: 회계집계표 마감(부서 SN_01 판관비) · 공통비 입력은 이 시트의 P_공통비에 저장' : '금액: 독립채산제 월 탭 채널 직접비') + ' · 분모: ' + (cfg.mode === 'gl' ? '생산매출(권장판매매출 x 이전가율 50%)' : '온라인 매출') + ' · 비교: 월평균 · 25년 거래처·품목은 이카운트 원장이 오면 보여요 · 숫자 기준: 3294bcb(2609 마감) 기준값에 26.10 가마감을 더했어요. 생산은 생산본부 부서 + 부서 SN_01 제조경비, 경영지원은 SN_01 판관비예요</div>';
     return h;
   }
 
@@ -120,6 +125,15 @@
     }
     return h + '</div>';
   }
+  function onlineVendorsHtml(d, cfg) {
+    var accs = d.업체계정 || []; if (!accs.length) return '';
+    var code = ST.ova || String(accs[0].account_code), v = CostCalc.vendors(d, code, ST.cur, ST.prev, cfg);
+    var h = '<div class="card scroll"><b>업체(계정 기준)</b> <span class="mut">온라인 거래처 줄은 채널이 아니라 계정으로 나뉘어 있어서 계정을 골라 봐요. 25년 거래처는 이카운트 원장이 오면 보여요.</span><div class="row" style="margin:8px 0"><select id="ova">' + accs.map(function (a) { return '<option value="' + esc(a.account_code) + '"' + (String(a.account_code) === code ? ' selected' : '') + '>' + esc(a.account_code + ' ' + a.name) + '</option>'; }).join('') + '</select></div>';
+    if (!v.length) return h + '<div class="mut">이 계정은 거래처 자료가 없어요.</div></div>';
+    h += '<table><tr><th>업체</th><th>이번 합</th><th>비교 합</th><th>증감</th><th class="l">출처</th><th class="l">성격</th></tr>';
+    v.slice(0, 100).forEach(function (x) { h += '<tr><td>' + esc(x.name) + '</td><td>' + f0(x.cur) + '</td><td>' + f0(x.prev) + '</td><td>' + sgn(x.diff, f0(x.diff)) + '</td><td class="l">' + esc(x.src) + '</td><td class="l">' + esc(x.nature) + '</td></tr>'; });
+    return h + '</table></div>';
+  }
   function itemsHtml(d, cfg) {
     var it = CostCalc.items(d, ST.cur, cfg).filter(function (r) { return r.amt > 0 || r.saving > 0; }).slice(0, 30);
     var h = '<div class="card scroll"><b>자재 단가(생산)</b> <span class="mut">이번 기간 구매 기준, 마지막 단가 변동과 절감 여력(오른 폭 x 이번 수량) 큰 순. 2025년 이후 자료예요.</span>';
@@ -147,7 +161,7 @@
       h += '<tr><td>' + esc(v[2]) + '</td><td class="l">' + esc(v[3]) + '</td><td>' + f0(v[4]) + '</td><td>' + f0(v[5]) + '</td><td>' + (v[6] === '' ? '-' : f2(v[6])) + '</td><td class="l">' + esc(v[7]) + '</td><td class="l">' + esc(v[8]) + '</td><td class="l">' + esc(v[9]) + '</td><td class="l"><select data-st="' + x.row + '">' + STATES.map(function (z) { return '<option' + (z === v[10] ? ' selected' : '') + '>' + z + '</option>'; }).join('') + '</select></td><td><button data-edit="' + x.row + '">수정</button> <button data-del="' + x.row + '">삭제</button></td></tr>';
     });
     if (!rows.length) h += '<tr><td colspan="10" class="l mut">아직 계획이 없어요. 아래에서 직접 추가해 주세요.</td></tr>';
-    h += '</table><div class="row" style="margin-top:12px"><select id="pa">' + opts + '</select><input id="pt" placeholder="대상(거래처·품목, 비우면 전체)" value="' + esc(pre.target || '') + '"><input id="pm" type="number" min="0" placeholder="목표 월 금액(원)"><input id="pr" type="number" min="0" max="100" step="0.01" placeholder="목표 비율(%)"><input id="pw" placeholder="방법(500자 이하)" size="30"><input id="po" placeholder="담당"><input id="pd" type="date"><select id="ps">' + STATES.map(function (z) { return '<option>' + z + '</option>'; }).join('') + '</select><button class="pri" id="padd">계획 추가</button></div><div id="perr" class="err"></div></div>';
+    h += '</table><div class="row" style="margin-top:12px"><select id="pa">' + opts + '</select><input id="pt" placeholder="대상(거래처·품목, 비우면 전체)" value="' + esc(pre.target || '') + '"><input id="pm" type="number" min="0" placeholder="목표 월 금액(원)"><input id="pr" type="number" min="0" max="100" step="0.01" placeholder="목표 비율(%)"><input id="pw" placeholder="방법(500자 이하)" size="30"><input id="po" placeholder="담당"><input id="pd" type="date"><input id="pn" placeholder="메모(500자 이하)"><select id="ps">' + STATES.map(function (z) { return '<option>' + z + '</option>'; }).join('') + '</select><button class="pri" id="padd">계획 추가</button></div><div id="perr" class="err"></div></div>';
     return h;
   }
   function adminPanel() { return '<div class="card"><b>관리자: 데이터 적재</b> <span class="mut">본부별 번들 파일(.json)을 고르면 해당 본부 시트의 D_ 탭을 덮어써요. P_계획·P_공통비·P_이력은 건드리지 않아요.</span><div class="row" style="margin-top:8px"><input type="file" id="bf" accept=".json" multiple><button id="bgo" class="pri">적재</button><span id="bmsg" class="mut"></span></div></div>'; }
@@ -169,6 +183,7 @@
     document.querySelectorAll('[data-edit]').forEach(function (b) { b.onclick = function () { ST.edit = +b.dataset.edit; rr(); var m = $('#em'), p = $('#er'); if (m) { var cur = Number(((S[ST.div].data.P_계획[ST.edit - 1]) || [])[4]) || 0; m.oninput = function () { p.value = m.value === '' ? '' : round(CostCalc.planFromAmount(cur, Number(m.value)), 2); }; p.oninput = function () { m.value = p.value === '' ? '' : CostCalc.planFromRatio(cur, Number(p.value)); }; } }; });
     document.querySelectorAll('[data-ecancel]').forEach(function (b) { b.onclick = function () { ST.edit = null; rr(); }; });
     document.querySelectorAll('[data-esave]').forEach(function (b) { b.onclick = function () { saveEdit(+b.dataset.esave); }; });
+    var ov = $('#ova'); if (ov) ov.onchange = function () { ST.ova = ov.value; rr(); };
     var ca = $('#cadd'); if (ca) ca.onclick = addCommon;
     document.querySelectorAll('[data-cdel]').forEach(function (b) { b.onclick = function () { delCommon(+b.dataset.cdel); }; });
     var m = $('#pm'), p = $('#pr');
@@ -177,9 +192,11 @@
   }
   function round(v, n) { return v === '' ? '' : Math.round(v * Math.pow(10, n)) / Math.pow(10, n); }
 
-  function validatePlan(code, amt, pct, way, st, due) {
+  function validatePlan(code, amt, pct, way, st, due, memoLen) {
+    memoLen = memoLen || 0;
     if (!code) return '계정을 골라 주세요.';
     if (way.length > 500) return '방법은 500자 이하로 적어 주세요.';
+    if (memoLen > 500) return '메모는 500자 이하로 적어 주세요.';
     if (amt === '' && pct === '') return '목표 월 금액이나 목표 비율 중 하나를 넣어 주세요.';
     if (pct !== '' && (pct < 0 || pct > 100)) return '목표 비율은 0~100 사이로 넣어 주세요.';
     if (amt !== '' && amt < 0) return '목표 월 금액은 0 이상이어야 해요.';
@@ -189,16 +206,16 @@
   }
   function logHist(k, action, id, detail) {
     var v = [new Date().toISOString(), EMAIL, action, id, detail];
-    return api(SH + CFG.divisions[k].sheetId + '/values/' + encodeURIComponent('P_이력!A:E') + ':append?valueInputOption=RAW&insertDataOption=INSERT_ROWS', { method: 'POST', headers: JSONH, body: JSON.stringify({ values: [v] }) }).catch(function () {});
+    return api(SH + CFG.divisions[k].sheetId + '/values/' + encodeURIComponent('P_이력!A:E') + ':append?valueInputOption=RAW&insertDataOption=INSERT_ROWS', { method: 'POST', headers: JSONH, body: JSON.stringify({ values: [v] }) }).catch(function () { ST.warn = '이력 기록에 실패했어요. 저장은 됐지만 이력(P_이력)에 남지 않았어요.'; });
   }
   function addPlan() {
     var k = ST.div, d = S[k].data, code = $('#pa').value, cur = curAvgOf(code);
     var amt = $('#pm').value === '' ? '' : Number($('#pm').value), pct = $('#pr').value === '' ? '' : Number($('#pr').value), way = $('#pw').value, st = $('#ps').value, due = $('#pd').value;
-    var err = validatePlan(code, amt, pct, way, st, due);
+    var err = validatePlan(code, amt, pct, way, st, due, $('#pn').value.length);
     if (err) { $('#perr').textContent = err; return; }
     if (amt === '') amt = CostCalc.planFromRatio(cur, pct); if (pct === '') pct = CostCalc.planFromAmount(cur, amt);
-    var id = d.P_계획.length ? d.P_계획.length : 1;
-    var v = [id, CFG.divisions[k].label, code, $('#pt').value, Math.round(cur), amt, pct, way, $('#po').value, due, st, '', new Date().toISOString(), EMAIL, ''];
+    var id = Date.now();
+    var v = [id, CFG.divisions[k].label, code, $('#pt').value, Math.round(cur), amt, pct, way, $('#po').value, due, st, $('#pn').value, new Date().toISOString(), EMAIL, ''];
     api(SH + CFG.divisions[k].sheetId + '/values/' + encodeURIComponent('P_계획!A:O') + ':append?valueInputOption=RAW&insertDataOption=INSERT_ROWS', { method: 'POST', headers: JSONH, body: JSON.stringify({ values: [v] }) })
       .then(function () { ST.pre = null; return logHist(k, '추가', id, code + ' ' + $('#pt').value + ' 목표 ' + amt); }).then(function () { return reload(k); }).catch(function (e) { $('#perr').textContent = '저장하지 못했어요: ' + e.message; });
   }

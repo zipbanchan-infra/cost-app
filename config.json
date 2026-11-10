@@ -30,7 +30,10 @@
         "KURLY": "컬리",
         "BULK_ETC": "대량/기타(네이버 포함)",
         "ONLINE_COMMON": "온라인 공통(미배부)"
-      }
+      },
+      "extraTabs": [
+        "업체계정"
+      ]
     },
     "MGMT": {
       "label": "경영지원본부",
