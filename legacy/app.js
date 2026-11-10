@@ -128,7 +128,7 @@
   function onlineVendorsHtml(d, cfg) {
     var accs = d.업체계정 || []; if (!accs.length) return '';
     var code = ST.ova || String(accs[0].account_code), v = CostCalc.vendors(d, code, ST.cur, ST.prev, cfg);
-    var h = '<div class="card scroll"><b>업체(계정 기준)</b> <span class="mut">온라인 거래처 줄은 채널이 아니라 계정으로 나뉘어 있어서 계정을 골라 봐요. 25년 거래처는 이카운트 원장이 오면 보여요. 원장 줄이 있는 계정만 나오고 원장에만 있는 금액도 있어서, 업체 합계는 헤드라인 비용 합과 달라요.</span><div class="row" style="margin:8px 0"><select id="ova">' + accs.map(function (a) { return '<option value="' + esc(a.account_code) + '"' + (String(a.account_code) === code ? ' selected' : '') + '>' + esc(a.account_code + ' ' + a.name) + '</option>'; }).join('') + '</select></div>';
+    var h = '<div class="card scroll"><b>업체(계정 기준)</b> <span class="mut">온라인 거래처 줄은 채널이 아니라 계정으로 나뉘어 있어서 계정을 골라 봐요. 25년 거래처는 이카운트 원장이 오면 보여요. 원장 줄이 있는 계정만 나오고, 원장에만 있는 금액과 같은 계정 안에서 원장과 채널비용 금액이 다른 달도 있어서, 업체 합계는 헤드라인 비용 합과 달라요.</span><div class="row" style="margin:8px 0"><select id="ova">' + accs.map(function (a) { return '<option value="' + esc(a.account_code) + '"' + (String(a.account_code) === code ? ' selected' : '') + '>' + esc(a.account_code + ' ' + a.name) + '</option>'; }).join('') + '</select></div>';
     if (!v.length) return h + '<div class="mut">이 계정은 거래처 자료가 없어요.</div></div>';
     h += '<table><tr><th>업체</th><th>이번 합</th><th>비교 합</th><th>증감</th><th class="l">출처</th><th class="l">성격</th></tr>';
     v.slice(0, 100).forEach(function (x) { h += '<tr><td>' + esc(x.name) + '</td><td>' + f0(x.cur) + '</td><td>' + f0(x.prev) + '</td><td>' + sgn(x.diff, f0(x.diff)) + '</td><td class="l">' + esc(x.src) + '</td><td class="l">' + esc(x.nature) + '</td></tr>'; });
