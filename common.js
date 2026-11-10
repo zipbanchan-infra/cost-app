@@ -107,8 +107,8 @@ function saveDraft(text,now){ST.draft=text?{text,at:hm()}:null;dlSet(text?{text,
 const retryDraft=()=>{const ta=document.getElementById('aiText');saveDraft(ta?ta.value:((ST.draft&&ST.draft.text)||''),true);};
 function restoreDraft(){const l=dlGet();if(l&&l.pending&&l.text&&(!ST.draft||ST.draft.text!==l.text)){ST.draft={text:l.text,at:l.at};setTimeout(()=>saveDraft(l.text,true),0);}}   // 저장 못 한 글이 브라우저에 남아 있으면 되살리고 다시 저장해 봐요
 window.addEventListener('online',()=>{if(ST.draftErr&&!ST.draftErr.login)retryDraft();});
-const MONTHS=['2507','2508','2509','','2601','2602','2603','2604','2605','2606','2607','2608','2609'];
-const per=ym=>ym.startsWith('25')?(+ym.slice(2)>=10?'25Q4':'25Q3'):(+ym.slice(2)<=6?'26H1':'26Q3');   // r13 c2: 25.10~12 는 25Q4
+const MONTHS=['2507','2508','2509','','2601','2602','2603','2604','2605','2606','2607','2608','2609','2610'];
+const per=ym=>ym.startsWith('25')?(+ym.slice(2)>=10?'25Q4':'25Q3'):(+ym.slice(2)<=6?'26H1':+ym.slice(2)>=10?'26M10':'26Q3');   // r13 c2: 25.10~12 는 25Q4
 // r8 P3(D7-8): 좁은 본문(u7.css 와 같은 @container main (max-width:720px), r8_p3.css)에서만 보이는 막대 위 짧은 값(1만 이상).
 //  숫자는 소수 1자리까지 · 끝 '.0' 은 빼요('1만'). 막대 칸(1280 + AI 열림 38px)에 한 줄로 들어가게 숫자 3자리까지:
 //  1.6만 · 16.2만 → 100만부터 162만 → 1,000만부터 0.16억 → 1억부터 1.2억 · 12.3억 → 100억부터 123억. 정확한 원 값은 title·아래 표·그림 이름(aria-label)

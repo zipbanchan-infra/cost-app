@@ -22,7 +22,7 @@ function topbar(){const D=[['prod','PROD','생산본부'],['online','ONLINE','�
  const tabs=`<div class="r10-tabs">${D.map(([d,,n])=>`<button class="r10-tab${st.div===d?' on':''}" data-div="${d}" aria-pressed="${st.div===d}">${n}</button>`).join('')}</div>`;
  const m=V5.mode();
  const modeSeg=`<span class="seg r10-mode"><button data-mode="ratio" class="${m==='ratio'?'on':''}">비율</button><button data-mode="amt" class="${m==='amt'?'on':''}">금액</button></span>`;
- const cmp=dd('r10Cmp',esc(CC().s),['q3','q4','h1','mom','qoq'].filter(k=>CMP[k]).map(k=>`<button data-cmp="${k}" class="${st.cmp===k?'on':''}">${CMP[k].l}</button>`).join(''),`${CC().pl} 대비 = ${CC().pl} 월평균과 이번 ${CC().cl} 월평균을 비교해요`);
+ const cmp=dd('r10Cmp',esc(CC().s),['q3','q4','h1','mom','qoq','m10'].filter(k=>CMP[k]).map(k=>`<button data-cmp="${k}" class="${st.cmp===k?'on':''}">${CMP[k].l}</button>`).join(''),`${CC().pl} 대비 = ${CC().pl} 월평균과 이번 ${CC().cl} 월평균을 비교해요`);
  const B=basesNow();const bas=m==='ratio'&&B.length>1?dd('r10Bas',esc(V5.basisLabel())+' 기준',B.map(([id,l])=>`<button data-basis="${id}" class="${id===V5.basis()?'on':''}">${esc(l)}</button>`).join(''),`${V5.basisLabel()} 기준 = 비용을 ${V5.basisLabel()}${roOf(V5.basisLabel())} 나눈 비율(%)로 봐요`):'';
  return `<div class="r10-top">${tabs}<div class="r10-ctl">${modeSeg}${cmp}${bas}</div></div>`;}
 
