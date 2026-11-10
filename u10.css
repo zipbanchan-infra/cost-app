@@ -1,0 +1,66 @@
+/* r6nd U10: DESIGN_ref_zax.md 규칙 맞춤(색 · 버튼 모양 · 높이 토큰 · 제목 굵기). 원본 static/*.css 는 그대로 두고 여기서 덮어써요(flow.html 맨 끝, u9.css 뒤).
+   높이는 DESIGN 2-5 토큰: control 32 · control-sm 28 · control-xs 24 · field 36, 배지는 4 '배지' 높이 20. 간격은 U9 4px 격자 그대로(좌우 여백만, 세로는 높이로). */
+
+/* ---------- 색: DESIGN 회색 단계 밖 회색 → 가까운 토큰 ---------- */
+.ai-err{background:#F7F7F7}                                       /* #F6F6F6 → 표면 보조 */
+.wf-c.resid .wf-b{background:repeating-linear-gradient(45deg,#E3E3E3 0 4px,#CCCCCC 4px 8px)} /* #C8C8C8 → #CCCCCC */
+input,textarea,select{color:#303030}                               /* 브라우저 기본 검정(#000) → 글자 */
+input::placeholder,textarea::placeholder{color:#616161}            /* DESIGN 자리표시 */
+.modal-bg{background:rgba(0,0,0,.5)}                                /* DESIGN 모달 뒤 가림 .5 */
+
+/* ---------- 버튼(DESIGN 4 버튼): 기본 32 · 좌우 12 · 14/550 · radius 8 ---------- */
+.btn.sm{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 12px;border-radius:8px;font-size:14px;line-height:20px;font-weight:550;white-space:nowrap}
+.btn.pri{background:#303030;color:#fff;box-shadow:inset 0 1px 0 0 rgba(255,255,255,.2),inset 0 -1px 0 0 #000,0 1px 0 0 rgba(0,0,0,.1)}
+.btn.pri:hover{background:#1A1A1A}
+.btn.pri:active{background:#1A1A1A;box-shadow:inset 0 3px 0 0 #000}
+/* 보조(secondary): 카드·모달·AI 창 안 = 흰 바탕 + 입체 테두리 */
+.btn.sec{background:#fff;color:#303030;box-shadow:inset 0 -1px 0 0 #B5B5B5,inset 0 0 0 1px #E3E3E3}
+.btn.sec:hover{background:#F7F7F7}
+.btn.sec:active{background:#F3F3F3}
+/* 페이지 머리('지금 할 일' 줄) 보조 = tertiary(#E3E3E3 채움, 그림자 없음) */
+.guide .btn.sec{background:#E3E3E3;box-shadow:none}
+.guide .btn.sec:hover{background:#D4D4D4}
+.guide .btn.sec:active{background:#CCCCCC}
+/* 위험 확인창의 확정 버튼 = danger(#C70A24) */
+#pmDel{background:#C70A24;color:#fff;box-shadow:none}
+#pmDel:hover{background:#A30A1F}
+#pmDel:active{background:#8E0B21;box-shadow:inset 0 3px 0 0 #690F1E}
+/* 비활성: 바탕 rgb(0 0 0/.05) · 글자 #8A8A8A */
+button.btn[disabled],.guide button.btn[disabled],button#pmDel[disabled]{background:rgba(0,0,0,.05);color:#8A8A8A;box-shadow:none}
+/* 'AI 열기'(떠 있는 주 버튼) · '다른 이슈 n개 더보기'(보조) = field 36 */
+.ai-open{height:36px;padding:0 16px;border-radius:8px;font-size:14px;line-height:20px;font-weight:550;box-shadow:inset 0 1px 0 0 rgba(255,255,255,.2),inset 0 -1px 0 0 #000,0 4px 16px rgba(0,0,0,.16)}
+.ai-open.show{display:inline-flex;align-items:center}
+.ai-open:hover{background:#1A1A1A}
+.morebtn{display:flex;align-items:center;justify-content:center;height:36px;padding:0 16px;border:none;border-radius:8px;background:#fff;box-shadow:inset 0 -1px 0 0 #B5B5B5,inset 0 0 0 1px #E3E3E3}
+.morebtn:hover{background:#F7F7F7}
+
+/* ---------- 조작부 높이 토큰(R6ND-32) ---------- */
+/* 본부 탭·단계: 알약 32(control), 바탕 안쪽 4 */
+.tabs .tab{display:inline-flex;align-items:center;height:32px;padding:0 16px;line-height:20px}
+.stp{height:32px;padding:0 12px}
+/* 세그먼트(비율|금액·기준·비교·정렬·목록|히트맵·상태): 바탕 32(control) 안 버튼 24(control-xs) */
+.seg{padding:4px;align-items:center}
+.seg button{display:inline-flex;align-items:center;height:24px;padding:0 12px;line-height:20px;border-radius:4px}
+.seg.aux button{padding:0 8px}
+/* 고르기 칩(히트맵 종류·채널) 32(control), AI 빠른 질문·닫기·토스트 동작 28(control-sm), 2단계 정보 칩 28, AI 맥락 칩 24(control-xs) */
+.chipb{display:inline-flex;align-items:center;height:32px;padding:0 12px;line-height:20px}
+.sugg button{display:inline-flex;align-items:center;height:28px;padding:0 8px;line-height:20px}
+.ai-h .x{display:inline-flex;align-items:center;height:28px;padding:0 8px;line-height:20px}
+.toast button{display:inline-flex;align-items:center;height:28px;padding:0 8px;border-radius:8px}
+.mchip{height:28px;padding:0 12px}
+.chip{display:inline-flex;align-items:center;height:24px;padding:0 8px;line-height:18px}
+/* 입력칸 36(field), 좌우 12 */
+input.search,.planc input{height:36px;padding:0 12px;border-radius:8px}
+/* 배지 20(높이 20 · radius 8): 히트맵 값 알약도 배지 */
+.pp{line-height:20px;border-radius:8px}
+.b-x{border:none;box-shadow:inset 0 0 0 1px #8A8A8A}               /* 테두리가 높이를 22로 늘리던 '예시' 배지: 배지는 테두리 없이(선은 안쪽 그림자) */
+
+/* ---------- 제목·숫자 굵기(R6ND-30): 700 → 650, 페이지 제목 = text-heading-lg 22/30 650, 모달 제목 = text-heading 16/24 650 ---------- */
+.pg-h{font-size:22px;line-height:30px;font-weight:650}
+.mt{font-size:16px;line-height:24px;font-weight:650}
+.brand,.big,.rank,.sect-h,.s2key,.pv,.pt3 .v,.sig .ititle{font-weight:650}
+
+/* ---------- 키보드 초점 툴팁(R6ND-26, DESIGN 4 '툴팁': 흰 바탕 · popover 그림자 · 13/20 #303030 · 안쪽 8 12 · 최대 폭 240) ---------- */
+#u10tip{position:fixed;z-index:30;max-width:240px;background:#fff;color:#303030;font-size:13px;line-height:20px;padding:8px 12px;border-radius:8px;
+  box-shadow:0 4px 6px -2px rgba(26,26,26,.2),0 0 0 1px rgba(0,0,0,.06);pointer-events:none;white-space:normal;overflow-wrap:anywhere;display:none}
+#u10tip.show{display:block}

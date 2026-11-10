@@ -1,0 +1,94 @@
+/* r10(2026-10-20 본부장님 지시): 단순 화면. body.r10(실서버 UI_MODE=simple)에서만 적용돼요.
+   흑백 그대로, 블록 구분은 회색 바탕 + 흰 블록 + 그림자(DESIGN 페이지 바탕 #EBEBEB~#F1F1F1 · 카드 #FFFFFF · --shadow-card).
+   왼쪽 메뉴·단계 표시줄·보조 칩·자료 출처 글은 숨기고, 비교·기준·정렬은 드롭다운 알약으로 접어요. */
+body.r10{background:#EBEBEB}
+body.r10 .side,body.r10 #sideToggle,body.r10 .foot,body.r10 #mchips,body.r10 #aiCtx,body.r10 #auxSeg{display:none}
+body.r10 .tm-ctrl>.vtl{display:none}   /* 히트맵 위 '보조' 꼬리표(보조 비교는 위 비교 드롭다운에 있어요) */
+body.r10 .main{padding:24px 32px 48px}
+body.r10 .main .col{max-width:960px;gap:16px}
+
+/* 블록: 흰 판 + 그림자(선 대신) */
+body.r10 .card,body.r10 .acc-i,body.r10 .tm-card,body.r10 #tm,body.r10 .r10-sec,body.r10 .r10-kpi,body.r10 .empty-st{background:#fff;border:none;border-radius:12px;box-shadow:0 0 0 1px rgb(0 0 0/.05),0 1px 0 0 rgb(0 0 0/.08),0 4px 12px -2px rgb(0 0 0/.08)}
+body.r10 .acc-b .card{box-shadow:none}
+
+/* 지금 할 일: 어두운 띠 하나로 눈에 띄게 */
+body.r10 .guide{background:#303030;color:#fff;border:none;border-radius:12px;box-shadow:0 4px 12px -2px rgb(0 0 0/.2);padding:16px 20px}
+body.r10 .guide .gk{color:#B5B5B5}
+body.r10 .guide .gt{color:#fff}
+body.r10 .guide .btn.pri{background:#fff;color:#303030;box-shadow:none}
+body.r10 .guide .btn.sec{background:#4A4A4A;color:#fff;box-shadow:none}
+
+/* 맨 위: 본부 밑줄 탭 + 오른쪽 조작 */
+body.r10 .r10-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:1px solid #D4D4D4}
+body.r10 .r10-tabs{display:flex;gap:24px}
+body.r10 .r10-tab{border:none;background:none;font-family:inherit;font-size:20px;line-height:28px;font-weight:650;color:#8A8A8A;padding:4px 0 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+body.r10 .r10-tab.on{color:#303030;border-bottom-color:#303030}
+body.r10 .r10-ctl{display:flex;gap:8px;align-items:center;padding-bottom:8px}
+body.r10 .seg{background:#fff;box-shadow:0 0 0 1px rgb(0 0 0/.06)}
+body.r10 .seg .on{background:#303030;color:#fff}
+
+/* 드롭다운 알약 */
+body.r10 .r10-dd{position:relative}
+body.r10 .r10-dd summary{list-style:none;display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgb(0 0 0/.08);font-size:13px;line-height:20px;font-weight:550;color:#303030;cursor:pointer;white-space:nowrap}
+body.r10 .r10-dd summary::-webkit-details-marker{display:none}
+body.r10 .r10-dd[open] summary{background:#303030;color:#fff}
+body.r10 .r10-dd .cv{font-size:12px}
+body.r10 .r10-menu{position:absolute;right:0;top:36px;z-index:30;min-width:200px;background:#fff;border-radius:12px;padding:4px;box-shadow:0 4px 6px -2px rgb(26 26 26/.2),0 0 0 1px rgb(0 0 0/.06);display:flex;flex-direction:column}
+body.r10 .r10-menu button{border:none;background:none;font-family:inherit;text-align:left;height:32px;padding:0 12px;border-radius:8px;font-size:14px;color:#303030;cursor:pointer;white-space:nowrap}
+body.r10 .r10-menu button:hover{background:#F1F1F1}
+body.r10 .r10-menu button.on{font-weight:650;background:#F3F3F3}
+
+/* 요약 카드 줄 */
+body.r10 .r10-kpis{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:12px}
+body.r10 .r10-kpi{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:16px;text-align:left;font-family:inherit;color:#303030;cursor:pointer;min-width:0;position:relative}
+body.r10 .r10-kpi:hover{box-shadow:0 0 0 1px rgb(0 0 0/.1),0 1px 0 0 rgb(0 0 0/.1),0 8px 16px -4px rgb(0 0 0/.12)}
+body.r10 .r10-kpi:disabled{cursor:default}
+body.r10 .r10-kl{font-size:13px;line-height:20px;color:#616161}
+body.r10 .r10-kb{font-size:22px;line-height:30px;font-weight:700}
+body.r10 .r10-ks{font-size:13px;line-height:20px;color:#616161;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+body.r10 .r10-kpi .r10-sp{position:absolute;right:16px;bottom:16px;width:64px}
+body.r10 .r10-kpi:has(.r10-sp) .r10-ks{max-width:calc(100% - 72px)}
+
+/* 섹션 + 순위 목록 */
+body.r10 .r10-sec{padding:8px 8px 12px}
+body.r10 .r10-sh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 12px 8px}
+body.r10 .r10-st{font-size:16px;line-height:24px;font-weight:700}
+body.r10 .r10-ss{font-size:13px;line-height:20px;color:#616161}
+body.r10 .r10-list{display:flex;flex-direction:column}
+body.r10 .r10-row{display:grid;grid-template-columns:32px minmax(0,1fr) 96px 132px 16px;gap:16px;align-items:center;padding:12px;border:none;background:none;border-radius:8px;font-family:inherit;color:#303030;text-align:left;cursor:pointer}
+body.r10 .r10-row:hover{background:#F3F3F3}
+body.r10 .r10-rk{font-size:16px;line-height:24px;font-weight:700;text-align:center}
+body.r10 .r10-nm{display:flex;flex-direction:column;min-width:0}
+body.r10 .r10-t{font-size:16px;line-height:24px;font-weight:650}
+body.r10 .r10-s{font-size:13px;line-height:20px;color:#616161;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.r10 .r10-v{display:flex;flex-direction:column;align-items:flex-end}
+body.r10 .r10-big{font-size:16px;line-height:24px;font-weight:700}
+body.r10 .r10-sub{font-size:13px;line-height:20px}
+body.r10 .up,body.r10 .r10-v.up{color:#B3261E}
+body.r10 .dn,body.r10 .r10-v.dn{color:#1B6E5A}
+body.r10 .r10-v.nd{color:#616161}
+body.r10 .r10-cv{color:#8A8A8A;font-size:16px}
+body.r10 .r10-more{display:block;width:100%;margin-top:4px;height:40px;border:none;background:none;border-top:1px solid #EBEBEB;font-family:inherit;font-size:14px;font-weight:550;color:#616161;cursor:pointer}
+body.r10 .r10-more:hover{color:#303030}
+body.r10 .r10-note{padding:8px 12px 0;font-size:13px;line-height:20px;color:#8A8A8A}
+body.r10 .r10-link{border:none;background:none;font-family:inherit;font-size:13px;font-weight:550;color:#616161;cursor:pointer}
+body.r10 .r10-hms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:4px 12px 4px}
+body.r10 .r10-hm{display:flex;justify-content:space-between;align-items:center;height:48px;padding:0 16px;border:none;border-radius:8px;background:#F3F3F3;font-family:inherit;font-size:14px;font-weight:600;color:#303030;cursor:pointer}
+body.r10 .r10-hm:hover{background:#E3E3E3}
+
+/* 2·3·4단계·히트맵: 뒤로가기 */
+body.r10 .r10-back{align-self:flex-start;border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;color:#303030;padding:4px 0;cursor:pointer}
+
+/* r13 c7: 아주 좁은 본문(768 + AI 열림 ≈ 320px)에서 요약 카드 4장이 한 줄에 끼어 숫자가 잘리던 것 -> 2열 */
+@container main (max-width:480px){
+ body.r10 .r10-kpis{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.r10 .r10-kb{overflow-wrap:anywhere}
+}
+/* 좁은 본문(1280 + AI 열림) */
+@container main (max-width:720px){
+ body.r10 .r10-row{grid-template-columns:24px minmax(0,1fr) 112px 12px}
+ body.r10 .r10-row .r10-sp{display:none}
+ body.r10 .r10-kpi .r10-sp{display:none}
+ body.r10 .r10-hms{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.r10 .r10-top{flex-wrap:wrap}
+}

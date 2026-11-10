@@ -1,0 +1,2 @@
+/* GS9: 제외 기능(AI·채널 이동) 자리 감추기. A 파일은 고치지 않고 이 파일로만 숨겨요 */
+#aiSide,#aiOpen,.r11-ai,[data-r11ai],#r13aAi,[data-r13ai],#moveBtn{display:none!important}

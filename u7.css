@@ -1,0 +1,41 @@
+/* r6nd U7: 데스크톱 1280~1440px 레이아웃. 본문 폭은 창 폭이 아니라 '왼쪽 메뉴 240 + AI 사이드바 400(열림)'을 뺀 값이라
+   본문(.main) 자체를 기준으로 맞춰요(container query). 1440 + AI 열림 = 본문 736px(그대로), 1280 + AI 열림 = 576px(좁은 본문 규칙). */
+.main{container:main/inline-size}
+/* 같은 원인(고정 폭·1fr 최소 폭) 공통 정리: 칸이 내용 폭만큼 늘어나 본문 밖(AI 사이드바 밑)으로 넘치던 것 */
+.tm-side3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.issue{grid-template-columns:420px 64px minmax(0,1fr)}
+.sortseg{gap:12px}
+.sortseg .sub{text-align:right}
+.imp .ir .dv{flex:none}
+.tm-sh .sn,.tm-sh .sa{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tm-sh .sn{flex:0 1 auto}
+.tm-sh .sa{flex:0 100 auto}
+.tm-sh .pp{flex:none}
+/* 히트맵 분류 칸이 머리글보다 좁으면(작은 분류) 비중 → 값 순서로 숨기고 이름은 말줄임. 전체 내용은 칸 툴팁(title) 그대로 */
+.tm-s{container-type:inline-size}
+@container (max-width:120px){.tm-sh .sa{display:none}}
+@container (max-width:88px){.tm-sh .pp{display:none}}   /* r13: 81px 칸에서 이름+증감이 2px 잘리던 것(지급수수료 업체 칸) - 숨기는 기준 72 -> 88px */
+@container (max-width:32px){.tm-sh .sn{display:none}}
+@container main (max-width:720px){
+  /* 1단계 이슈 행: 카드 420px 고정 → 남는 폭, 오른쪽 영향 220px */
+  .issue{grid-template-columns:minmax(0,1fr) 40px minmax(0,220px)}
+  .morebtn{width:calc(100% - 260px)}
+  .imp .ir.ndr .nm2{white-space:normal}
+  /* 히트맵 아래 카드 3개 → 분류(한 줄 전체) + 상승·하락 TOP 두 칸 */
+  .tm-side3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tm-side3>:first-child{grid-column:1/-1}
+  /* 월별 막대: 막대 칸이 글자 폭만큼 늘지 않게, 긴 값·'25.10~12'는 칸 안에서 줄바꿈 */
+  .chart{gap:4px;height:216px}
+  .chart .bar{min-width:0}
+  .chart .bar .bb{height:188px}
+  .chart .bt,.chart .bl{overflow-wrap:anywhere;text-align:center}
+  .chart .bt{line-height:16px}
+  /* 워터폴: 값이 칸보다 길면 칸 안에서 두 줄(모든 칸 같은 높이라 막대 기준선은 그대로) */
+  .wf{gap:4px}
+  .wf-v{display:flex;align-items:flex-end;justify-content:center;min-height:32px;white-space:normal;overflow-wrap:anywhere;text-align:center}
+}
+/* 모달: 창 높이 800 에서도 화면 안(넘치면 모달 안에서 스크롤), 띄어쓰기 없는 긴 업체·방법 이름은 모달 폭 안에서 줄바꿈 */
+.modal{max-height:calc(100vh - 48px);overflow-y:auto}
+.modal .sub,.modal .an,.modal .mt{overflow-wrap:anywhere}
+/* 채널 이동 이력: 좁은 본문에서 '이동됨'·시각이 글자 단위로 끊기지 않게(긴 글 줄바꿈은 가운데 칸만) */
+.tbl.hist td:first-child,.tbl.hist td:last-child{white-space:nowrap;overflow-wrap:normal}

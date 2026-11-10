@@ -1,0 +1,26 @@
+/* r10 AI 수리(2026-10-20 본부장님: "AI 답 기다리는 중 아무 변화가 없어 진행 중인지 모르겠어"). 예전 화면·단순 화면(body.r10) 둘 다 적용.
+   보내기를 누르면 AI 자리에 '답을 만드는 중이에요' + 움직이는 점 세 개 + 경과 초, 보내기 버튼은 잠기고 스피너. 움직임 줄이기 설정이면 점·스피너 없이 글만.
+   흑백(#303030 · 회색 글 #616161 · 말풍선 #F3F3F3), 글자 13·14px, 간격 4px 배수(DESIGN_ref_zax 2-1·2-2·2-3). */
+.ai-wait{align-self:flex-start;display:flex;align-items:center;gap:8px;max-width:92%;padding:8px 12px;border-radius:12px;background:#F3F3F3;color:#303030;font-size:14px;line-height:22px}
+.ai-wait-s{font-size:13px;line-height:20px;color:#616161;font-variant-numeric:tabular-nums}
+.ai-dots{display:inline-flex;align-items:center;gap:4px;height:22px}
+.ai-dots i{width:6px;height:6px;border-radius:50%;background:#303030;opacity:.25;animation:aiDot 1.2s ease-in-out infinite}
+.ai-dots i:nth-child(2){animation-delay:.2s}
+.ai-dots i:nth-child(3){animation-delay:.4s}
+@keyframes aiDot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+.ai-spin{display:inline-block;width:12px;height:12px;margin-right:8px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;vertical-align:-2px;box-sizing:border-box;animation:aiSpin .8s linear infinite}
+@keyframes aiSpin{to{transform:rotate(360deg)}}
+.ai-retry{align-self:flex-start}
+@media (prefers-reduced-motion:reduce){.ai-dots,.ai-spin{display:none}.ai-dots i,.ai-spin{animation:none}}
+/* r10 AI 절감 계획 대화(2026-10-21 본부장님: 목표 금액·기한은 대화로 묻고 다 차면 '등록할까요'). 작성 중 띠 + 칸 상태(글로 '채움·묻는 중·빈 칸', 색만으로 구분하지 않음).
+   흑백 · 글자 13·14px · 간격 4px 배수 · 모서리 12(카드)·8(알약). 확인 카드는 예전 .planc 그대로, 고칠 칸 고르기 줄만 더함 */
+.plan-flow{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #E3E3E3;border-radius:12px;background:#FFFFFF;font-size:14px;line-height:22px;color:#303030}
+.plan-flow .pf-t{display:flex;flex-direction:column;gap:4px}
+.plan-flow .pf-t .sub{font-size:13px;line-height:20px;color:#616161}
+.plan-flow .pf-s{display:flex;flex-wrap:wrap;gap:4px}
+.plan-flow .pf-c{font-size:12px;line-height:18px;background:#F3F3F3;color:#616161}
+.plan-flow .pf-c.done{background:#E3E3E3;color:#303030}
+.plan-flow .pf-c.now{background:#303030;color:#FFFFFF}
+.planc .pf-fix{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.planc .pf-fix .sub{font-size:13px;line-height:20px;color:#616161;width:100%}
+.planc .pbs{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}

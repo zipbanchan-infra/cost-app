@@ -1,0 +1,44 @@
+/* r6nd U9: 글꼴 굵기 · 최소 글자 12px · 4px 간격 격자. 원본 static/*.css 는 그대로 두고 여기서 덮어써요(flow.html 맨 끝에서 불러옴).
+   [글꼴] 예전: @font-face 없이 'Pretendard'(PC 에 설치된 글꼴)에 기대서, 이 맥처럼 SemiBold·ExtraBold 두 굵기만 깔린 PC 에서는
+   400·450·550 이 모두 SemiBold(600), 650·700 이 모두 ExtraBold(800)로 그려졌어요(설치 안 된 PC 는 다른 글꼴).
+   지금: 버전 고정 Pretendard Variable v1.3.9(fonts/SOURCE.txt, OFL) 한 파일을 같은 서버에서 받아 450·550·650·700 을 그 굵기 그대로 그려요.
+   파일을 못 받으면 시스템 한글 글꼴(맥 Apple SD Gothic Neo · 윈도 맑은 고딕 · 그 밖 Noto Sans KR)로 — 일부 굵기만 깔린 설치 글꼴 'Pretendard' 는 일부러 뺐어요. */
+@font-face{font-family:'Pretendard Variable';font-weight:45 920;font-style:normal;font-display:swap;
+  src:url('fonts/PretendardVariable.woff2') format('woff2-variations'),url('fonts/PretendardVariable.woff2') format('woff2')}
+body{font-family:'Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif;font-weight:450}
+/* 버튼·입력칸은 브라우저 기본이 400 이라 본문 굵기(DESIGN text-body 450)를 물려받게 */
+button,input,textarea,select{font-family:inherit;font-weight:inherit}
+.sig .imp .ir[disabled] .nm2{font-weight:450}
+
+/* [간격] 4px 배수가 아닌 margin·padding·gap(원본 2·3·6·10·14·18px)을 4의 배수로. 높이를 지키려고 글자 줄높이를 같이 바꾼 곳은 배지·칩뿐 */
+.sel{padding:4px 12px}
+.tab{padding:4px 16px}
+.seg{padding:4px}
+.seg button{padding:4px 12px}
+.seg.aux button{padding:4px 8px}
+.b{padding:0 8px;line-height:20px}
+.b.big{padding:4px 8px;line-height:18px}
+.chip{padding:4px 8px;line-height:18px}
+.chipb{padding:4px 12px}
+.btn.sm{padding:8px 12px}
+.bt{margin-bottom:4px}
+.ai-h .x{padding:4px 8px}
+.msg{padding:8px 12px}
+.msg .mt2{margin-bottom:4px}
+.sugg button{padding:4px 8px}
+.ai-in textarea{padding:8px 12px}
+.planc{gap:8px}
+.planc input{padding:4px 8px}
+.ireason{margin-top:4px}
+.foldb ul{margin:4px 0 0 16px}
+.tm-sh{gap:4px}
+.tm-row{padding:8px 0}
+.spark{gap:4px}
+.mchip{gap:4px}
+.wf{gap:4px}
+.wf-n{padding:0 4px}
+.pt3{gap:4px}
+.sigs{gap:8px}
+/* 시그널 영향 줄: 위아래 2px 여백 + 줄 사이 4px → 줄 안 4px + 줄 사이 0(글자 사이 거리 8px 그대로) */
+.sig .imp{gap:0}
+.sig .imp .ir,.sig .im{padding:4px 0}

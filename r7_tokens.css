@@ -1,0 +1,27 @@
+/* r7 P2 (R6ND-34·35 추천 (2), 2026-10-18 20:09 승인): DESIGN_ref_zax.md 카드(2-4 radius 12 · --shadow-card, 2-3 안쪽 16)와 2-2 글자 토큰.
+   flow.html 맨 끝(r7_p1.css 뒤)에서 불러와 덮어써요. 원본 static/*.css·다른 오버레이는 그대로. 모달·토스트 부품(R6ND-36)과 히트맵·워터폴 단계색, 주 버튼 #303030 은 손대지 않아요.
+   어떤 선택자를 왜 바꿨는지(전/후 계산값)는 docs_r6nd/P2_TOKENS.md. */
+:root{--shadow-card:0 0 0 1px rgb(0 0 0 / .07),0 1px 0 0 rgb(0 0 0 / .10),0 2px 3px 0 rgb(0 0 0 / .03)}
+
+/* ---------- 카드(R6ND-34): radius 16 · 안쪽 20/24 · 얕은 그림자 → radius 12 · 안쪽 16 · --shadow-card ---------- */
+.card,.guide,.issue>.icard,.tm-card,.acc-i,#tm,.empty-st{border-radius:12px;box-shadow:var(--shadow-card)}
+.card,.guide,.issue>.icard,.tm-card{padding:16px}
+.guide{border:none}                                                /* 테두리 #E3E3E3 → 카드 그림자(옆 1px 선 포함) */
+.acc-h{padding:16px}                                               /* 접는 카드: 머리 16/24 · 몸 0 24 20 → 머리 16 · 몸 0 16 16 */
+.acc-b{padding:0 16px 16px}
+.empty-st{padding:32px 16px}                                       /* DESIGN 빈 화면: 위아래 32, 좌우는 카드 안쪽 16 */
+.acc-b .card{box-shadow:none;padding:0}                            /* 접는 카드 안의 표 묶음은 카드 안 구획(그림자·안쪽 없음 그대로) */
+.sig .icard{border-radius:12px}                                    /* 카드 안 시그널 타일: radius 14(토큰 밖) → 12, 테두리·안쪽은 그대로 */
+
+/* ---------- 글자(R6ND-35): 2-2 토큰 밖 크기 → 토큰(크기/줄높이) ---------- */
+.brand{font-size:16px;line-height:24px}                            /* 18/26 → text-heading 16/24 */
+.s2key{font-size:22px;line-height:30px}                            /* 핵심 수치 28/36 → text-heading-lg 22/30 */
+.sect-h{font-size:16px !important;line-height:24px}                /* 소제목 20/28 · '단가 이슈' 17(app.js 인라인 style) → text-heading 16/24. 인라인을 이기려고 !important 한 곳만 */
+.pt3 .v{font-size:16px;line-height:24px}                           /* 단가 타일 값 20/28 → text-heading 16/24 */
+.pcard .pv{font-size:15px;line-height:22px}                        /* 계획 금액 18/22 → text-heading-sm 15/22 */
+.ct,.tm-card .ct{font-size:15px;line-height:22px}                  /* 카드 제목 16/24 · 히트맵 옆 카드 제목 14/24 → text-heading-sm 15/22 */
+.acc-h .at{font-size:15px;line-height:22px}                        /* 접는 카드 제목 16/24 → 15/22 */
+.ititle,.sig .ititle,.rank{font-size:15px;line-height:22px}        /* 이슈 카드 제목·순위 16/24 · 시그널 제목 15/24 → 15/22 */
+.ai-h .t{font-size:15px;line-height:22px}                          /* AI 창 제목 16/22 → 패널 제목 text-heading-sm 15/22 */
+.pg-s,.guide .gt{font-size:14px;line-height:22px}                  /* 페이지 부제·'지금 할 일' 안내 15/22 → text-body 14/22 */
+.foot{font-size:13px;line-height:20px}                             /* 바닥글 12/18(캡션은 배지용) → 보조 text-body-sm 13/20 */

@@ -1,0 +1,34 @@
+/* r8 P3 (본부장님 승인 2026-10-19). flow.html 맨 끝(r7_p3.css 뒤). DESIGN(docs/DESIGN_ref_zax.md) 토큰만 써요 */
+/* (1) D7-8: 막대 위 값 - 넓은 본문은 지금 표기(bt-w), 좁은 본문(u7.css 와 같은 조건 @container main (max-width:720px) = 1280 + AI 열림 등)만 '1.6만' 짧은 표기(bt-n, common.js manS) */
+.chart .bt .bt-n{display:none}
+@container main (max-width:720px){
+  .chart .bt .bt-w{display:none}
+  .chart .bt .bt-n{display:inline}
+}
+/* (2) E8: 상태 배지 = DESIGN 신호등 배지 톤 + 앞 표시(채운 점 8, 조치 필요는 빈 고리 8). 상태 이름·개수는 그대로
+   초안 = 노랑(사람 조치 필요: 확정 전) · 진행 = 회색(진행 중) · 완료 = 초록(정상·완료) · 보류 = 빨강(멈춤) */
+#planList .pcard .b[data-st]{display:inline-flex;align-items:center;gap:4px}
+#planList .pcard .b[data-st]::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+#planList .pcard .b[data-st="초안"]{background:#FFEB78;color:#4F4700}
+#planList .pcard .b[data-st="초안"]::before{background:none;box-shadow:inset 0 0 0 1.5px currentColor}
+#planList .pcard .b[data-st="진행"]{background:#F0F0F0;color:#616161}
+#planList .pcard .b[data-st="완료"]{background:#AFFEBF;color:#014B40}
+#planList .pcard .b[data-st="보류"]{background:#FED1D7;color:#8E0B21}
+#planList .pcard[hidden]{display:none}
+/* 거르기: 앱의 분절 전환(.seg) 그대로 + 개수는 회색 */
+.pfilter{display:flex;flex-wrap:wrap;gap:8px}
+.pfilter .seg button{white-space:nowrap}
+.pfilter .seg button .pfc{padding:0;margin-left:4px;font-size:13px;line-height:20px;color:#616161;font-weight:450}
+/* 최근 삭제 · 되돌리기 */
+.ptrash .ptr-h{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;text-align:left;color:#303030}
+.ptrash .ptr-t{font-size:15px;line-height:22px;font-weight:650}
+.ptrash .ptr-c{font-size:13px;line-height:20px;font-weight:550;color:#005BD3;flex:none}
+.ptrash .ptr-s{margin-top:8px}
+.ptrash .ptr-r{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #EBEBEB;font-size:14px;line-height:20px}
+.ptrash .ptr-s+.ptr-r,.ptrash .uerr+.ptr-r{margin-top:8px}
+.ptrash .ptr-i{min-width:0;overflow-wrap:anywhere}
+.ptrash .ptr-r .btn{flex:none}
+.ptrash .uerr{margin-top:8px}
+.ptrash .ptr-m:empty{display:none}
+.ptrash .ptr-m{margin-top:8px}
+section.ptrash:not(.card) .ptr-m{margin-top:0}

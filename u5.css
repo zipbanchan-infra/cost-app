@@ -1,0 +1,22 @@
+/* r6nd U5: 오류 안내 · 저장 중 잠금 · 빈 상태(0건). 색은 신호등 빨강(#FED1D7 바탕 / #8E0B21 글자 / 실패 토스트 #C70A24)만 씀 */
+.uerr{background:#FED1D7;color:#303030;border-radius:8px;padding:8px 12px;font-size:13px;line-height:20px;overflow-wrap:anywhere}
+.uerr-t{font-size:14px;line-height:20px;font-weight:650;color:#8E0B21}
+.uerr-h{margin-top:4px}
+.uerr-d{margin-top:4px;font-size:12px;line-height:16px;color:#4A4A4A}
+.ai-err.uerr{background:#FED1D7;color:#303030}
+.uerr-x{float:right;margin-left:8px;background:none;border:none;font-family:inherit;font-size:12px;line-height:20px;color:#4A4A4A;cursor:pointer;text-decoration:underline}
+#mErr .uerr,#pmErr .uerr{margin-top:8px}
+#bootErr .uerr{max-width:640px}
+.toast.bad{background:#C70A24}
+.toast.bad button{color:#fff;text-decoration:underline}
+.sv.bad{color:#8E0B21}
+.sugg button[disabled],.linkbtn[disabled]{opacity:.5;cursor:default}
+button[aria-busy="true"]{cursor:progress}
+.empty-st{background:#fff;border-radius:16px;padding:32px 16px;text-align:center}
+.empty-st .es-t{font-size:16px;line-height:24px;font-weight:650;color:#303030}
+.empty-st .es-h{margin-top:4px;font-size:13px;line-height:20px;color:#616161}
+.empty-st .btn{margin-top:12px}
+.ai-empty b{font-weight:650;color:#303030}
+/* 긴 글(띄어쓰기 없는 긴 이름·방법)이 칸 밖으로 넘치지 않게 */
+.msg,.saved .si,.pcard,.planc,.uerr,.tbl.hist td{overflow-wrap:anywhere}
+#bootErr #bootRetry{align-self:flex-start}

@@ -1,0 +1,5 @@
+/* r7 P1(R6ND-17): 절감 계획 목표는 화면에 한 줄. 긴 예전 문구는 말줄임(전체는 title). 데이터는 그대로예요. */
+.pcard .pv.ptgt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved .si .ptgt{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+#pmTgtPrev{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plist .pcard{min-width:0}                                        /* 격자 칸이 말줄임 글 때문에 넓어지지 않게 */

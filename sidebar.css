@@ -1,0 +1,31 @@
+/* 2026-10-18 20:08 본부장님 지시: 왼쪽 메뉴·오른쪽 AI 대화 사이드바 접기/펼치기(데스크톱). flow.html 맨 끝(u10.css 뒤).
+   DESIGN_ref_zax.md: 접으면 폭 48 세로 띠(펴기 아이콘), 조작부 높이 control 32 · field 36, 초점 = u8.css(:focus-visible). 색은 기존 토큰(#303030·#616161·#EBEBEB·#E3E3E3·#fff)만 */
+.side{transition:width .16s ease,padding .16s ease}
+.side-tg{position:absolute;top:20px;right:8px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:8px;background:transparent;color:#616161;cursor:pointer;padding:0;font-family:inherit}
+.side-tg:hover{background:#E3E3E3;color:#303030}
+.side-tg svg,.ai-open svg{width:20px;height:20px;flex:none}
+.side .brand{padding-right:40px}
+/* 왼쪽 접힘 = 48 세로 띠: 펴기 버튼 + 메뉴 아이콘만(글자는 화면에서만 숨기고 이름은 그대로 = 읽기 프로그램·툴팁) */
+body.side-col .side{width:48px;padding:12px 4px;align-items:center}
+body.side-col .side-tg{position:static;margin-bottom:8px}
+body.side-col .side .brand,body.side-col .side .brand-s,body.side-col .side .side-b,body.side-col .side .nav .cnt{display:none}
+body.side-col .side .nav{width:40px;height:36px;padding:0;font-size:0;line-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.side .nav::before{content:"";display:none;width:20px;height:20px;background:currentColor;-webkit-mask:var(--ic) center/20px 20px no-repeat;mask:var(--ic) center/20px 20px no-repeat}
+body.side-col .side .nav::before{display:block}
+.side .nav[data-nav="flow"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M3 15l4.5-5 3.5 3L17 6'/%3E%3Cpath d='M12.5 6H17v4.5'/%3E%3C/svg%3E")}
+.side .nav[data-nav="hm"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6'%3E%3Crect x='3' y='3' width='6' height='6' rx='1'/%3E%3Crect x='11' y='3' width='6' height='6' rx='1'/%3E%3Crect x='3' y='11' width='6' height='6' rx='1'/%3E%3Crect x='11' y='11' width='6' height='6' rx='1'/%3E%3C/svg%3E")}
+.side .nav[data-nav="price"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linejoin='round'%3E%3Cpath d='M3 3h7l7 7-7 7-7-7z'/%3E%3Ccircle cx='7' cy='7' r='1.3'/%3E%3C/svg%3E")}
+.side .nav[data-nav="online"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linejoin='round'%3E%3Cpath d='M2.5 3.5h2.2l2 9.5h8.6l1.7-7H6'/%3E%3Ccircle cx='8' cy='16.3' r='1.2'/%3E%3Ccircle cx='14.5' cy='16.3' r='1.2'/%3E%3C/svg%3E")}
+.side .nav[data-nav="plan"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='12' height='14' rx='2'/%3E%3Cpath d='M7.5 10l2 2 3.5-4'/%3E%3C/svg%3E")}
+/* 오른쪽: AI 접힘 = 48 세로 띠 + 다시 여는 탭(#aiOpen, field 36). 본문은 접힌 만큼 넓어져요 */
+.ai-rail{display:none;width:48px;flex:none;position:sticky;top:0;height:100vh;background:#fff;border-left:1px solid #E3E3E3;flex-direction:column;align-items:center;padding:16px 0;gap:8px}
+body.ai-col .ai-rail{display:flex}
+.ai-rail .ai-open{position:static;box-shadow:none;width:36px;height:36px;padding:0;justify-content:center;border-radius:8px}
+.ai-rail .ai-open.show{display:inline-flex}
+.ai-rail .ai-cap{writing-mode:vertical-rl;font-size:13px;line-height:20px;color:#616161;font-weight:550;cursor:pointer;user-select:none;letter-spacing:.02em}
+.ai-rail .ai-cap:hover{color:#303030}
+/* R6ND-14(2026-10-18 20:09 승인): 1단계 이슈 카드·단가 이슈 줄 'n개 더보기' = 누르면 펼치는 버튼(시그널 카드와 같은 모양). 보조 글자 #616161 */
+.imp button.im{background:none;border:none;font-family:inherit;cursor:pointer;text-align:left;font-size:13px;line-height:20px;color:#616161;padding:4px 0}
+.imp button.im:hover{color:#303030;text-decoration:underline}
+/* 접으면 가운데 본문이 넓어지게: 본문 칸 최대 880 제한을 풀어 늘어난 #main 폭을 그대로 써요(둘 다 펼침 1440 = 본문 736 은 그대로) */
+body.side-col .main .col,body.ai-col .main .col{max-width:none}

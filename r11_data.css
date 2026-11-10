@@ -1,0 +1,43 @@
+/* r11b(2026-10-26) 표로 보기 · 구매 거래처 · AI 입력 안내. 단순 화면(body.r10)에서만. 되돌리기 = flow.html 두 줄 빼기 */
+body.r10 .r11-vt{display:inline-flex;margin-left:auto;background:#F1F1F1;border-radius:999px;padding:3px;gap:2px}
+body.r10 .hmkinds{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+body.r10 .r11-vt button{border:0;background:transparent;padding:6px 12px;border-radius:999px;font:inherit;font-size:13px;color:#616161;cursor:pointer}
+body.r10 .r11-vt button.on{background:#303030;color:#fff}
+body.r10 #page.r11-tblmode #tm,body.r10 #page.r11-tblmode #tmSide,body.r10 #page.r11-tblmode .tm-ctrl{display:none}
+body.r10 #page.r11-pvmode #tm,body.r10 #page.r11-pvmode #tmSide,body.r10 #page.r11-pvmode .tm-ctrl,body.r10 #page.r11-pvmode .vhead:not(.r11-vh),body.r10 #page.r11-pvmode .exnote{display:none}
+body.r10 .r11-tblsec{padding:16px}
+body.r10 .r11-tbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px}
+body.r10 .r11-q{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#616161}
+body.r10 .r11-q input{width:280px;padding:8px 12px;border:1px solid #D0D0D0;border-radius:8px;font:inherit;font-size:14px;color:#303030}
+body.r10 .r11-cnt{font-size:12px;color:#616161}
+body.r10 .r11-tw{max-height:560px;overflow:auto;border-top:1px solid #EBEBEB}
+body.r10 .r11-t{width:100%;border-collapse:collapse;font-size:13px}
+body.r10 .r11-t th{position:sticky;top:0;background:#fff;text-align:left;font-weight:600;color:#616161;padding:8px;border-bottom:1px solid #EBEBEB;white-space:nowrap}
+body.r10 .r11-t th button{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}
+body.r10 .r11-t td{padding:9px 8px;border-bottom:1px solid #F3F3F3;vertical-align:top}
+body.r10 .r11-t .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+body.r10 .r11-t tbody tr[data-r11row],body.r10 .r11-t tbody tr[data-r11pv],body.r10 .r11-t tbody tr[data-r11pm]{cursor:pointer}
+body.r10 .r11-t tbody tr[data-r11row]:hover,body.r10 .r11-t tbody tr[data-r11pv]:hover,body.r10 .r11-t tbody tr[data-r11pm]:hover{background:#F7F7F7}
+body.r10 .r11-t tr.nock{cursor:default}
+body.r10 .r11-t .up{color:#B3261E}
+body.r10 .r11-t .dn{color:#1B6E5A}
+body.r10 .r11-nm{color:#303030;font-weight:500}
+body.r10 .r11-u{display:inline-block;margin-left:6px;font-size:12px;color:#616161}
+body.r10 .r11-top{display:block;margin:2px 0 0 18px;white-space:normal}
+body.r10 .r11-nd{color:#616161}
+body.r10 .r11-vch{background:#FFF4E5;border-radius:6px;padding:1px 6px}
+body.r10 .r11-sub>td{background:#FAFAFA;padding:4px 8px 10px 26px}
+body.r10 .r11-in th{position:static;background:#FAFAFA}
+body.r10 .r11-cv{color:#8A8A8A}
+body.r10 .r11-empty{text-align:center;color:#616161;padding:24px}
+body.r10 .r11-hint{margin-top:8px;font-size:12px;color:#616161}
+body.r10 .r11-note{margin:4px 0 12px;padding:10px 14px;background:#fff;border-radius:12px;box-shadow:var(--shadow-card);font-size:13px;color:#303030}
+body.r10 .r11-link{border:0;background:none;color:#303030;font:inherit;font-weight:600;cursor:pointer;padding:0 0 0 4px}
+body.r10 .r11-ailbl{font-size:12px;color:#616161;margin:0 0 6px}
+body.r10 .r11-ailbl b{color:#303030}
+body.r10 .r11-aihelp{font-size:12px;color:#616161;margin-top:6px;line-height:1.4}
+body.r10 .r11-how{margin:8px 0 0 18px;padding:0;font-size:13px;color:#303030;display:flex;gap:18px;flex-wrap:wrap}
+body.r10 .r11-how li{list-style:decimal}
+body.r10 #ccTbl .up{color:#B3261E}
+body.r10 #ccTbl .dn{color:#1B6E5A}
+body.r10 #ccTbl .r11-nd{color:#616161}

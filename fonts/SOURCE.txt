@@ -1,0 +1,8 @@
+# r6nd U9: Pretendard Variable 글꼴 파일 출처(버전 고정). 화면은 이 파일을 같은 서버에서 받아요(외부 주소로 요청하지 않음, 인터넷 없어도 같음).
+file: PretendardVariable.woff2
+version: v1.3.9
+url: https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/variable/woff2/PretendardVariable.woff2
+sha256: 9599f12fd42fc0bce1cd50b47a0c022e108d7aa64dd0d1bb0ed44f3282d900b4
+checked: 2026-10-18 npm pretendard@1.3.9 (cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/woff2/PretendardVariable.woff2) 와 sha256 같음
+weights: 45-920 (가변 글꼴 하나로 450·550·650·700 등 모든 굵기)
+license: SIL Open Font License 1.1 (LICENSE.txt, 원본 저장소 v1.3.9 LICENSE 그대로)

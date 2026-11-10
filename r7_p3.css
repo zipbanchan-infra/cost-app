@@ -1,0 +1,14 @@
+/* r7 P3: 캡처 직접 확인(U8·U9)에서 찾은 화면 깨짐 정리. flow.html 맨 끝(r7_tokens.css 뒤). 색·글자 크기·간격 토큰은 바꾸지 않아요 */
+/* (1) 모달(높이 100vh-48, 안에서 스크롤)이 꽉 차면 한 줄 말줄임 칸(계획 수정 '목표 문구' 미리보기, r7_p1.css)이 높이 4px 로 눌려 글자가 거의 안 보였어요(1280×800, 칸 오류 3개 + 서버 안내). 줄이지 말고 모달 안에서 스크롤 */
+.modal>*{flex-shrink:0}
+/* (2) 좁은 본문(1280 + AI 열림)에서 1단계 정렬 버튼 '증가폭 순'·'증가율 순'이 두 줄로 꺾였어요. 버튼은 한 줄, 옆 설명 글이 줄바꿈 */
+.sortseg .seg{flex:none}
+.sortseg .seg button{white-space:nowrap}
+/* (3) 히트맵 작은 칸: 칸 높이 34~39px 이면 이름·값 두 줄(16+16+위아래 4)이 위아래로 잘렸어요 → 값만 한 줄.
+       분류 상자 높이가 머리 줄(28px)보다 낮으면 머리 글자가 반쯤 잘려 보였어요 → 숨김(이름·숫자는 상자 title·키보드 툴팁 그대로) */
+.tm-r{container-type:size}
+@container (max-height:39.9px){.tm-r .tn{display:none}}
+.tm-s{container-type:size}
+@container (max-height:27.9px){.tm-sh{visibility:hidden}}
+/* (4) r7_tip.js 로 초점이 가는 히트맵 분류 머리 줄: 상자가 overflow:hidden 이라 바깥 초점 테두리가 잘려서 안쪽에 그려요(u8.css 히트맵 칸과 같은 방식) */
+.tm-sh:focus-visible{outline-offset:-2px}
