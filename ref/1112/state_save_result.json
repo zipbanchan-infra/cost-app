@@ -224,22 +224,22 @@
     "after_json"
    ],
    [
-    17944832153871,
-    17944832153750,
+    17944832995221,
+    17944832995100,
     "create",
     "jang_hoyeon@sannamchon.co.kr",
-    "2026-11-12 20:33",
+    "2026-11-12 20:34",
     "",
-    "{\"id\":17944832153750,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"전체\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 20:33\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"created_name\":\"장호연\"}"
+    "{\"id\":17944832995100,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"전체\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 20:34\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"created_name\":\"장호연\"}"
    ],
    [
-    17944832154712,
-    17944832153750,
+    17944832996062,
+    17944832995100,
     "delete",
     "jang_hoyeon@sannamchon.co.kr",
-    "2026-11-12 20:33",
-    "{\"id\":17944832153750,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"전체\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 20:33\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"\",\"deleted_at\":\"\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"\"}",
-    "{\"id\":17944832153750,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"전체\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 20:33\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"jang_hoyeon@sannamchon.co.kr\",\"deleted_at\":\"2026-11-12 20:33\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"장호연\"}"
+    "2026-11-12 20:34",
+    "{\"id\":17944832995100,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"전체\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 20:34\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"\",\"deleted_at\":\"\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"\"}",
+    "{\"id\":17944832995100,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"전체\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 20:34\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"jang_hoyeon@sannamchon.co.kr\",\"deleted_at\":\"2026-11-12 20:34\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"장호연\"}"
    ]
   ]
  },
@@ -249,7 +249,7 @@
   "ok": true,
   "d": [
    {
-    "id": 17944832153750,
+    "id": 17944832995100,
     "vendor": "전체",
     "due": "2026-12-31",
     "method": "단가절감",
@@ -272,7 +272,7 @@
   "ok": true,
   "d": {
    "del": false,
-   "deleted_at": "2026-11-12 20:33"
+   "deleted_at": "2026-11-12 20:34"
   }
  },
  {
