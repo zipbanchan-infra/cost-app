@@ -211,7 +211,7 @@
         if (a.indexOf(b.division) < 0) return { status: 403, body: { error: 'division_forbidden', division: b.division } };
         return itemNames().then(function (items) {
           var p = b.plan;
-          if (p && typeof p === 'object') p = Object.assign({}, p, { target: targetText(p.target_amount_krw, p.target_unit) });
+          if (p && typeof p === 'object') p = Object.assign({}, p, { target: (!isInt(p.target_amount_krw) && isStr(p.target_note) && trim(p.target_note)) ? trim(p.target_note).slice(0, 60) : targetText(p.target_amount_krw, p.target_unit) });
           var bad = planError(p) || planExtraError(p, items); if (bad) return { status: 400, body: bad };
           var q = {}; Object.keys(p).forEach(function (k) { q[k] = PLAN_REQ.indexOf(k) >= 0 ? trim(p[k]) : p[k]; });
           if (!planSchemaOk(q)) return { status: 400, body: { error: 'bad_plan' } };

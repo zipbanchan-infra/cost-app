@@ -32,3 +32,15 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  auth/mode.js
 d0a4a6438f15f982acce34347aee07df3f2570fef054d414d3190ed95712e032  index.html
 f51c7fef0c155ed83fdd221099883f656eecb80c94e44e742b828522cc3def26  bundle.js
 ```
+
+## 수정 2회차 후 (2026-11-12 KST)
+r9_api.js 해시 변경: 본부장님 11/12 20:38 승인, 214행 1줄
+나머지 보호 파일 5개(config.json, shim.js, auth/mode.js, index.html, bundle.js)는 기준표와 해시 동일: True
+```
+9cab12fb5d22d4959ff1713e1f2c60afb511beda90bd520809fd52f6e6502ca9  config.json
+ef61bc30f49b944e0eed862257c5777a1fc5cea4e66f33195ad95737a9586851  shim.js
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  auth/mode.js
+3b2bc3d2e506d7f1ef69766098d8b480455f52a1d88b25a9f921b787f1da5062  r9_api.js
+d0a4a6438f15f982acce34347aee07df3f2570fef054d414d3190ed95712e032  index.html
+f51c7fef0c155ed83fdd221099883f656eecb80c94e44e742b828522cc3def26  bundle.js
+```

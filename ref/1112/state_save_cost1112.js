@@ -63,6 +63,30 @@ const rows = []; const T = (id, name, ok, d) => { rows.push({ id, name, ok: !!ok
   await p.check('input[name=psMethod][value="기타"]'); await p.fill('#psPlan', 'F2 계획'); await p.fill('#psReason', 'F2 사유');
   const pay = await p.evaluate(async () => { const o = []; const orig = V5.api; V5.api = function (u, m, b) { if (m === 'POST') o.push(b); return Promise.reject(Object.assign(new Error('stop'), { kind: 'x' })); }; document.getElementById('psSave').click(); await new Promise(r => setTimeout(r, 400)); V5.api = orig; return o[0]; });
   T('F2b', '결함2: 업체 상세 저장 payload = account 계정(코드), vendor 그 업체, account_code 계정코드', pay && pay.plan.account === `${vd.an}(${vd.va})` && pay.plan.vendor === vd.vn && pay.account_code === vd.va, pay && { a: pay.plan.account, v: pay.plan.vendor, c: pay.account_code });
+  // ---- N1(회귀): 업체 상세 품목 히트맵 칸 -> 현재 단가·품목코드 자동 ----
+  const cand = await p.evaluate(() => { const o = []; (vendAccounts() || []).forEach(a => a.vend.forEach(v => o.push({ va: a.code, vv: v.code }))); return o.slice(0, 80); });
+  let n1 = null;
+  for (const c of cand) {
+    await p.evaluate(h => { location.hash = h; }, `#div=prod&s=3&a=vd&va=${c.va}&vv=${c.vv}&ax=item`); await p.waitForTimeout(350);
+    const n = await p.locator('#r10HmMap [data-r10hc]:not([data-chg=""])').count();
+    if (n > 0) { n1 = c; break; }
+  }
+  T('N1a', 'N1 준비: 품목 히트맵이 있는 업체 상세를 찾음', !!n1, cand.length);
+  if (n1) {
+    const key = await p.locator('#r10HmMap [data-r10hc]:not([data-chg=""])').first().getAttribute('data-r10hc');
+    await p.locator('#r10HmMap [data-r10hc]:not([data-chg=""])').first().click(); await p.waitForTimeout(300);
+    const cn = await ctxOf();
+    T('N1b', 'N1: 업체 상세 품목 칸 클릭 -> 품목코드=그 칸, 현재 단가 자동, 거래처=그 업체, 계정 유지', cn.itemCode === key && !!cn.item && cn.cu != null && cn.vendor === (await p.evaluate(() => vdData().v.name)) && /\(/.test(cn.account), { cn, key });
+    await p.check('input[name=psMethod][value="단가절감"]'); await p.waitForTimeout(200);
+    const pc2 = await p.evaluate(() => ({ cur: document.getElementById('psCur').textContent, v: document.getElementById('psCur').dataset.v }));
+    T('N1c', 'N1: 단가절감 선택 시 현재 단가 칸에 값이 들어감', !!pc2.v && /원/.test(pc2.cur), pc2);
+    await p.evaluate(h => { location.hash = h; }, '#div=prod&s=3&a=5029&ax=vend'); await p.waitForTimeout(500);
+    const cx = await ctxOf();
+    T('N1d', 'N1: 다른 화면으로 가면 그 칸 맥락이 안 남음', !cx.item && !cx.itemCode && cx.cu == null, cx);
+    await p.evaluate(h => { location.hash = h; }, `#div=prod&s=3&a=vd&va=${n1.va}&vv=${n1.vv}&ax=item`); await p.waitForTimeout(450);
+    const cy = await ctxOf();
+    T('N1e', 'N1: 업체 상세에 다시 와도 칸을 안 눌렀으면 품목 맥락 없음', !cy.item && cy.cu == null, cy);
+  }
   await p.evaluate(() => { document.getElementById('psPlan').value = ''; }); 
   await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForTimeout(300);
   await p.evaluate(() => { localStorage.removeItem('cost1112_plan_draft'); }); await p.reload(); await p.waitForSelector('button[data-div]', { timeout: 15000 }); await p.waitForFunction(() => window.R10_READY === true); await p.waitForTimeout(500);
@@ -83,6 +107,9 @@ const rows = []; const T = (id, name, ok, d) => { rows.push({ id, name, ok: !!ok
   const o = {}; hd.forEach((h, i) => o[h] = row[i]); const c = JSON.parse(o.content);
   T('P3', '시트에서 다시 읽은 행: vendor=품목 거래처(또는 전체), due=2026-12-31, 방법=단가절감, 사유 일치, 계정 5029',
     S[PROD]['P_계획_A'].length === 2 && c.vendor && c.due === '2026-12-31' && c.method === '단가절감' && c.basis === want.r && o.account_code === '5029', { vendor: c.vendor, due: c.due, method: c.method, basis: c.basis, acc: o.account_code, memo: c.memo });
+  const tIdx = hd.indexOf('target'); const cu0 = c.target;
+  T('X3', 'FIX3: 목표 단가 100000 입력 -> 시트 target 칸에 "목표 단가 100,000원..." 이 들어감(금액 입력 필요 아님)', /^목표 단가 100,000원/.test(String(o.target || cu0 || '')), { target: o.target, ctarget: c.target, tIdx });
+  T('X3b', 'FIX3: target_note 자체는 content에 저장되지 않음', !('target_note' in c), Object.keys(c));
   T('P4', 'P_이력_A 에 create 이력 1건', S[PROD]['P_이력_A'].length === 2 && S[PROD]['P_이력_A'][1].includes('create'), S[PROD]['P_이력_A']);
   const back = await p.evaluate(async () => (await V5.api('/api/plans')).plans.filter(x => /COST1112 테스트/.test(JSON.stringify(x))).map(x => ({ id: x.id, vendor: x.vendor, due: x.due, method: x.method, basis: x.basis })));
   T('P5', 'API로 다시 읽어도 같은 행 1개', back.length === 1 && back[0].due === '2026-12-31' && back[0].method === '단가절감', back);

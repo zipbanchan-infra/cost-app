@@ -19,7 +19,10 @@ function ctx(){const o={account:'',code:'',vendor:'',item:'',itemCode:'',cu:null
  const st=g('st');if(!st)return o;o.div=st.div;
  try{const R=window.R10CHART;const H=R&&R.HM;
   if(st.s===3&&st.a==='price'&&st.div==='prod'){const it=g('pItem')();if(it){const u=g('pchg')(it,st.cmp);o.item=it.n;o.itemCode=it.c;o.cu=u.cu;o.unit=it.u||'';o.account='원재료 단가';o.where=it.n;}}
-  else if(st.a==='vd'&&st.s>=2){const {a,v}=g('vdData')();o.account=`${a.name}(${a.code})`;o.code=a.code;o.vendor=v.name;o.where=`${a.name} · ${v.name}`;const x=g('cmpM')(v.m);o.ratio=x.rc;}
+  else if(st.a==='vd'&&st.s>=2){const {a,v}=g('vdData')();o.account=`${a.name}(${a.code})`;o.code=a.code;o.vendor=v.name;o.where=`${a.name} · ${v.name}`;let m=v.m;
+    const live=H&&H.sel&&H.id===[st.div,st.a,st.va,st.vv,st.pm,H.kind].join('|')&&!!document.getElementById('r10HmMap');const row=live?H.rows.find(r=>r.key===H.sel):null;
+    if(row){m=row.m;o.cu=row.cu==null?null:row.cu;o.unit=row.unit||'';o.item=row.name;o.itemCode=row.key;o.where=`${a.name} · ${v.name} · ${row.name}`;}
+    const x=g('cmpM')(m);o.ratio=x.rc;}
   else if(st.s>=2&&st.a&&st.a!=='price'&&st.a!=='vd'){const i=g('cur')();if(i){o.account=i.title+(i.code&&/^[0-9]{4}$/.test(i.code)?`(${i.code})`:'');o.code=/^[0-9]{4}$/.test(i.code||'')?i.code:'';o.where=i.title;
     let m=i.m;const live=st.s===3&&H&&H.sel&&H.id===[st.div,st.a,st.va,st.vv,st.pm,H.kind].join('|')&&!!document.getElementById('r10HmMap');const row=live?H.rows.find(r=>r.key===H.sel):null;
     if(row){m=row.m;o.cu=row.cu==null?null:row.cu;o.unit=row.unit||'';if(H.kind==='vend'){o.vendor=row.name;}else{o.item=row.name;o.itemCode=row.key;if(row.vns&&row.vns.length===1)o.vendor=row.vns[0];}o.where=`${i.title} · ${row.name}`;}
@@ -71,6 +74,7 @@ function payload(c){const st=g('st');const div=DIVID[st.div]||'PROD';const m=D.m
  const memo=[D.plan.trim(),m==='단가절감'||m==='업체변경'?(tgt.v!=null?`목표 단가 ${fmt(tgt.v)}원`:'')+($('psCur')&&$('psCur').dataset.v?` (현재 단가 ${fmt(Number($('psCur').dataset.v))}원)`:''):m==='사용량 절감'?(tgt.v!=null?`목표 매출 대비 비율 ${tgt.v}%`:'')+($('psCur')&&$('psCur').dataset.v?` (현재 ${Number($('psCur').dataset.v).toFixed(2)}%)`:''):''].filter(Boolean).join('\n').slice(0,1000);
  const plan={account:c.account||'전체',vendor:c.vendor||'전체',method:m,due:DUE,basis:D.reason.trim(),target:'',target_amount_krw:null,state:'계획',turns:[]};
  if(memo)plan.memo=memo;if(m==='사용량 절감'&&tgt.v!=null&&tgt.v<=100)plan.target_ratio=tgt.v;
+ if(tgt.v!=null&&(priceMethod(m)||m==='사용량 절감'))plan.target_note=priceMethod(m)?`목표 단가 ${fmt(tgt.v)}원${c.unit?'/'+c.unit:''}`:`목표 비율 ${tgt.v}%`;
  if(c.itemCode&&div==='PROD'&&c.item)plan.item_code=c.itemCode;
  return {plan,division:div,account_code:c.code||null,page:'절감계획 사이드바',manual:true};}
 async function submit(){if(busy)return;const c=ctx();say('');$('psReasonErr').textContent='';const te=$('psTgtErr');if(te)te.textContent='';
