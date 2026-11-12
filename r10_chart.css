@@ -133,3 +133,21 @@ body.r10 .r10-gleg i{width:12px;height:12px}
  body.r10 .r10-leg .r10-lh{margin-left:0}
 }
 body.r10 .r10-gleg i.none{background:#F7F7F7;box-shadow:inset 0 0 0 1px #D4D4D4}
+
+/* COST1112 히트맵(거래처별·품목별) + 하단 추세 */
+body.r10 .r10-hmw{position:relative;width:100%;height:380px;margin-top:12px;border-radius:8px;overflow:hidden;background:#F7F7F7}
+body.r10 .r10-hc{position:absolute;box-sizing:border-box;margin:0;padding:6px 8px;border:2px solid #fff;border-radius:0;text-align:left;overflow:hidden;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:2px;align-items:flex-start;justify-content:flex-start}
+body.r10 .r10-hc .n{font-size:13px;line-height:17px;font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+body.r10 .r10-hc .c{font-size:12px;line-height:16px}
+body.r10 .r10-hc.sel{outline:3px solid #303030;outline-offset:-3px;z-index:2}
+body.r10 .r10-hc:hover{filter:brightness(.95)}
+body.r10 .r10-hc.rest{background:#EBEBEB;color:#616161;cursor:default}
+body.r10 .r10-trend{margin-top:16px;padding:16px;border:1px solid #E3E3E3;border-radius:12px;background:#fff}
+body.r10 .r10-trend.empty{background:#F7F7F7;border-style:dashed;color:#616161}
+body.r10 .r10-trh{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-bottom:8px;font-size:14px}
+body.r10 .r10-trn{font-weight:700;font-size:16px;color:#303030}
+body.r10 .r10-trs{margin-left:auto;display:inline-flex;border:1px solid #D4D4D4;border-radius:8px;overflow:hidden}
+body.r10 .r10-trs button{height:32px;padding:0 14px;border:0;background:#fff;font:inherit;font-size:13px;cursor:pointer;color:#303030}
+body.r10 .r10-trs button.on{background:#303030;color:#fff}
+body.r10 .r10-trs button:disabled{color:#8A8A8A;cursor:not-allowed;background:#F7F7F7}
+body.r10 .r10-trw{display:block;margin-bottom:8px;font-size:12px;color:#616161}

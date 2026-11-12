@@ -10,7 +10,7 @@
 //  6 공통비 입력 = 실제 비용(2026-10-30 본부장님 결정, 합계에 더함 · app.js ccMerge): 순서 안내 + 금액 칸 설명 + 단계별 '합계 반영' 열 안내
 (function(){
 if(!document.body.classList.contains('r10'))return;
-const R={view:(()=>{try{return sessionStorage.getItem('r11_hmv')||'map';}catch(e){return 'map';}})(),pv:false,q:'',sort:null,open:new Set()};
+const R={view:'map',pv:false,q:'',sort:null,open:new Set()};
 const $$=(s,r)=>[...(r||document).querySelectorAll(s)];
 const g=n=>{try{return (0,eval)(n);}catch(e){return undefined;}};   // app.js 의 전역 const(st·CC·M2 등)를 전역 범위에서 이름으로 읽기(이 파일 안 같은 이름과 안 섞임)
 const cleanN=n=>String(n||'').replace(/_/g,' ').replace(/\s+/g,' ').replace(/^거래처 공란$/,'거래처 미기재').trim();
@@ -73,7 +73,6 @@ function fixHm(M){const st=g('st');const hk=M.querySelector('#hmKinds');if(!hk||
  const isProd=st.div==='prod';
  if(isProd&&!hk.querySelector('[data-r11pvbtn]'))hk.insertAdjacentHTML('beforeend',`<button type="button" class="chipb${R.pv?' on':''}" data-r11pvbtn="1">구매 거래처</button>`);
  if(R.pv)hk.querySelectorAll('[data-hm]').forEach(b=>b.classList.remove('on'));
- if(!R.pv&&!hk.querySelector('.r11-vt'))hk.insertAdjacentHTML('beforeend',`<span class="r11-vt" role="group" aria-label="보기 방식"><button type="button" data-r11v="map" class="${R.view==='map'?'on':''}" aria-pressed="${R.view==='map'}">칸 그림</button><button type="button" data-r11v="tbl" class="${R.view==='tbl'?'on':''}" aria-pressed="${R.view==='tbl'}">표로 보기</button></span>`);
  const page=M.querySelector('#page');
  if(R.pv){page.classList.add('r11-pvmode');if(!M.querySelector('#r11Pv'))hk.insertAdjacentHTML('afterend',pvHtml());
   const gt=M.querySelector('#guideText');if(gt)gt.textContent='거래처 줄을 누르면 그 거래처에서 산 자재와 단가가 펼쳐져요. 자재를 누르면 단가 상세로 가요.';return;}

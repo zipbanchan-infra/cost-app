@@ -186,7 +186,7 @@ function drawTM(){const el=document.getElementById('tm');if(!el)return;const H=h
  el.innerHTML=html;el.querySelectorAll('[data-tm]').forEach(b=>{if(!b.classList.contains('nock'))b.onclick=()=>hmClick(b.dataset.tm)});}
 function hmClick(id){const k=st.hm;
  if(k==='price'||k==='pack')return openPrice(id);
- if(k==='acc')return go({s:2,a:id,n:null,ch:null,hm:null});
+ if(k==='acc')return go({s:3,a:id,n:null,ch:null,hm:null});
  if(k==='ch'){const [ch,it]=id.split('|');st.pendOpen=['lines','month'];return go({s:3,a:it,ch,hm:null});}
  const [acc,vc]=id.split('|');st.pendOpen=['vmonth'];return go({s:3,a:'vd',va:acc,vv:vc,hm:null});}
 function openPrice(code){st.pendOpen=['pmonth'];go({s:3,a:'price',pm:code,hm:null});}
@@ -198,11 +198,11 @@ function hmSide(H){const ok=H.all.filter(i=>i.cv!=null&&i.ca>=TOPMIN&&i.click);c
  <div class="tm-card" id="topUp"><div class="ct">${w||'상승률'} ${w?'상승 ':''}TOP</div>${lst(up,`${CC().pl}보다 오른 칸이 없어요`)}</div><div class="tm-card" id="topDn"><div class="ct">${w||'하락률'} ${w?'하락 ':''}TOP</div>${lst(dn,`${CC().pl}보다 내린 칸이 없어요`)}${nds?`<div class="sub" id="topNd" style="margin-top:8px">${CC().pl} 비교 기간 없는 ${nds}칸은 ${ND}이라 순위에서 뺐어요</div>`:''}</div></div>`;}
 function hmView(){const H=hmModel();const C=CC();
  return `${guide(!H.secs.length?`이 히트맵은 그릴 칸이 없어요. 위에서 다른 종류를 골라 보세요.`:H.pm?`칸 색이 진한 빨강일수록 ${st.div==='online'?OBL:'매출'} 대비 비율이 많이 올랐어요. 칸을 누르면 다음 단계로 가요.`:`칸 색이 진한 빨강일수록 많이 늘었어요. 칸을 누르면 다음 단계로 가요.`,'')}
- <div class="vhead"><div><div class="pg-eyebrow">${divName()} · 히트맵 · ${C.s}</div><div class="pg-h">${esc(H.title)} <span class="pg-n num" id="heatSum" title="${C.cl} 합계 ${f(H.tot)}원 · 금액 ${pctS(H.avg)}">${amtMode()?man(H.tot)+' · '+pctS(H.avg):V5.pct(H.tot,salesSum(C.cur))+' · '+(H.kind==='cost'?ppS(H.pp):'단가 '+pctS(H.avg))}</span></div></div>${viewSeg()}</div>
+ <div class="vhead"><div><div class="pg-eyebrow">${divName()} · 히트맵 · ${C.s}</div><div class="pg-h">${esc(H.title)} <span class="pg-n num" id="heatSum" title="${C.cl} 합계 ${f(H.tot)}원 · 금액 ${pctS(H.avg)}">${amtMode()?man(H.tot)+' · '+pctS(H.avg):V5.pct(H.tot,salesSum(C.cur))+' · '+(H.kind==='cost'?ppS(H.pp):'단가 '+pctS(H.avg))}</span></div></div></div>
  <div class="hmkinds" id="hmKinds">${hmKinds().map(([k,l])=>`<button class="chipb${st.hm===k?' on':''}" data-hm="${k}">${l}</button>`).join('')}</div>
  <div class="tm-ctrl"><span class="vtl">보조</span>${auxSeg()}
  <span class="tm-leg" id="tmLeg">${(H.pm?BKP:BK).map(([k,l])=>`<span><i style="background:${BKC[k]}"></i>${l}</span>`).join('')}</span><span class="tm-size" id="tmSize">크기 = ${C.cl} ${H.kind==='price'?'구매금액':'금액'} · 색 = ${H.pm?`${st.div==='online'?OBL:'매출'} 대비 비율 변화(%p)`:H.kind==='price'?'단가 등락':'금액 등락(월평균)'}</span></div>
- ${H.secs.length?'<div id="tm"></div>':emptyBox('tmEmpty','이 히트맵에 그릴 칸이 없어요',`${C.cl} 금액이 있는 항목이 없어요. 다른 히트맵 종류나 비교 기준을 골라 보세요.`)}${hmSide(H)}<div class="exnote">${esc(H.note)}</div>`;}
+ ${H.secs.length?'<div id="tm"></div>':emptyBox('tmEmpty','이 히트맵에 그릴 칸이 없어요',`${C.cl} 금액이 있는 항목이 없어요. 다른 히트맵 종류나 비교 기준을 골라 보세요.`)}<div class="exnote">${esc(H.note)}</div>`;}
 function priceIssue(){const H=heat('raw',st.cmp);const imp=H.its.filter(i=>i.chg!=null&&i.cu>i.pu).map(i=>({...i,imp:i.cq*(i.cu-i.pu)})).sort((a,b)=>b.imp-a.imp);
  const m={};M2.items.filter(i=>i.g==='ZIP_M').forEach(i=>Object.entries(i.m).forEach(([y,v])=>m[y]=(m[y]||0)+v[0]));
  return {id:'price',title:'원재료 단가',code:'ZIP_M',H,imp,n15:H.its.filter(i=>i.chg!=null&&i.chg>=15).length,m,c:tots(m),drivers:[],dl:'자재'};}
@@ -324,8 +324,8 @@ function step4(){const plans=V5.ST.plans;
 function curCh(){if(st.div!=='online'||st.a==='vd')return null;/* U4: 업체 상세에는 채널이 없어요(예전엔 자사몰 채널 매출이 기준 선택지로 보였어요) */if(st.ch)return st.ch;const i=cur();const d=i&&i.drivers.filter(x=>x.d>0)[0]||i&&i.drivers[0];return d?d.id:'D2C';}
 function monthTable(vals,label){return `<table class="tbl sm" id="monthTbl"><thead><tr><th>월</th><th class="num">${amtMode()?'금액(원)':'비율 · '+V5.basisLabel()+' 대비'}</th></tr></thead><tbody>${V5.MONTHS.map(y=>y?`<tr><td class="num l">${ym2(y)}</td><td class="num">${vals[y]!=null?V5.vYm(vals[y],y):'-'}</td></tr>`:`<tr><td colspan="2" class="sub">25.10~12 비교 기간 없음</td></tr>`).join('')}</tbody></table>`;}
 function step3(){const i=cur();if(!i)return step1();
- const nx=guide(`필요한 표만 펼쳐 봐요. 오른쪽 AI 창에서 바로 절감 계획을 만들 수 있어요.`,prevBtn()+nextBtn('계획 확인'));
- const head=`<div><button class="linkbtn" id="backDetail" style="font-size:14px;color:#616161">‹ ${esc(i.title)} 원인 보기</button></div><div><div class="pg-eyebrow">${divName()} · ${esc(i.title)} ${i.code}</div><div class="pg-h">${josa(i.title,'을','를')} 자세히 봐요</div><div class="pg-s">표는 접혀 있어요. 제목을 누르면 펼쳐져요.</div>${st.div==='online'&&!amtMode()&&curCh()?'<div class="pg-s" id="basisHint">‘채널 매출’ 기준은 월별 흐름·월별 줄 표에만 써요.</div>':''}</div>`;// r7 P1(R6ND-6): 기준 선택지는 그대로, 짧은 안내 1줄
+ const nx=guide(`필요한 표만 펼쳐 봐요. 오른쪽 AI 창에서 바로 절감 계획을 만들 수 있어요.`,`<button class="btn sec sm" id="prevList" data-step="1">‹ 이전</button>`+nextBtn('계획 확인'));
+ const head=`<div><button class="linkbtn" id="backList" style="font-size:14px;color:#616161">‹ 이슈 목록</button></div><div><div class="pg-eyebrow">${divName()} · ${esc(i.title)} ${i.code}</div><div class="pg-h">${josa(i.title,'을','를')} 자세히 봐요</div><div class="pg-s">표는 접혀 있어요. 제목을 누르면 펼쳐져요.</div>${st.div==='online'&&!amtMode()&&curCh()?'<div class="pg-s" id="basisHint">‘채널 매출’ 기준은 월별 흐름·월별 줄 표에만 써요.</div>':''}</div>`;// r7 P1(R6ND-6): 기준 선택지는 그대로, 짧은 안내 1줄
  if(isP())return nx+head+sigBlock(sigs3(i),'원인 → 영향')+`<div class="accs">${prodAccs(i)}</div>`;
  return nx+head+sigBlock(sigs3(i),'채널 → 비율(온라인 매출 대비)')+`<div class="accs">${onlineAccs(i)}</div>`;}
 // ---------- r6: 토스 시그널(원인 카드 → 영향 대상 2개 + n개 더보기) ----------
@@ -445,7 +445,7 @@ function toggleSet(id){st.open.has(id)?st.open.delete(id):st.open.add(id);render
 function bind(){const M=document.getElementById('main');const $=id=>document.getElementById(id);
  M.querySelectorAll('[data-div]').forEach(b=>b.onclick=()=>go({div:b.dataset.div,s:1,a:null,n:null,ch:null}));
  M.querySelectorAll('[data-step]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>go({s:+b.dataset.step})});
- M.querySelectorAll('[data-issue]').forEach(b=>b.onclick=()=>go({s:2,a:b.dataset.issue,n:null,ch:null}));
+ M.querySelectorAll('[data-issue]').forEach(b=>b.onclick=()=>go({s:3,a:b.dataset.issue,n:null,ch:null}));   // COST1112: 원인 화면(2단계)을 건너뛰고 그 계정 세부내역으로
  M.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{st.sort=b.dataset.sort;render()});
  M.querySelectorAll('[data-fold]').forEach(b=>b.onclick=()=>toggleSet(b.dataset.fold));
  M.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>toggleSet(b.dataset.acc));
