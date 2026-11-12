@@ -21,6 +21,55 @@ const rows = []; const T = (id, name, ok, d) => { rows.push({ id, name, ok: !!ok
   T('S2', "localStorage 키 'cost1112_plan_draft' 에 입력값 저장", ls && ls.includes('단가 재협상'), ls && ls.slice(0, 80));
   await p.reload(); await p.waitForSelector('button[data-div]', { timeout: 15000 }); await p.waitForFunction(() => window.R10_READY === true); await p.waitForTimeout(500);
   T('S3', '새로 고침 후에도 사이드바 값이 그대로', same(await read()), await read());
+  // ---- 결함 1·2 재현 시험(수정 1회차): 화면·계정·본부가 바뀌면 자동 값이 현재 화면 기준, 사용자가 쓴 글은 유지 ----
+  const ctxOf = () => p.evaluate(() => { const c = window.COST1112_SIDE.ctx(); return { account: c.account, vendor: c.vendor, item: c.item, itemCode: c.itemCode, cu: c.cu, where: c.where }; });
+  await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=item'; }); await p.waitForTimeout(600);
+  await p.locator('#r10HmMap [data-r10hc]:not([data-chg=""])').first().click(); await p.waitForTimeout(300);
+  const c1 = await ctxOf();
+  T('F1a', '결함1 준비: 5029 품목 칸을 누르면 사이드바 맥락에 그 품목이 잡힘', !!c1.item && c1.cu != null && /5029/.test(c1.account), c1);
+  await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForTimeout(500);
+  const k1 = await p.evaluate(() => [...document.querySelectorAll('.r10-row[data-issue] .r10-t')].map(x => x.textContent.trim()));
+  const sj = k1.findIndex(x => x.includes('수선비')); const oth = sj >= 0 ? sj : k1.findIndex(x => !x.includes('부재료비'));
+  await p.locator('.r10-row[data-issue]').nth(oth).click(); await p.waitForTimeout(500);
+  const c2 = await ctxOf();
+  T('F1b', '결함1: 홈 -> 다른 계정 클릭 후 이전 품목·거래처·현재단가가 남지 않음', !c2.item && !c2.itemCode && !c2.vendor && c2.cu == null && c2.account && c2.account !== c1.account, { c1, c2 });
+  await p.check('input[name=psMethod][value="단가절감"]'); await p.fill('#psPlan', 'F1 계획 글'); await p.fill('#psReason', 'F1 사유 글'); await p.waitForTimeout(200);
+  const f1v = await p.evaluate(() => ({ cur: document.getElementById('psCur').dataset.v, tgt: document.getElementById('psTgt').value }));
+  T('F1c', '결함1: 다른 계정 화면에서 현재 단가 칸이 이전 값 없이 비어 있음(안내 문구)', f1v.cur === '', f1v);
+  const ps = await p.evaluate(() => { const c = window.COST1112_SIDE.ctx(); return c.account; });
+  await p.evaluate(() => { location.hash = '#div=online'; }); await p.waitForTimeout(500);
+  const c3 = await ctxOf();
+  T('F1d', '결함1: 본부 전환(온라인) 후에도 이전 품목·거래처 없음 + 사용자 글(계획·사유) 유지', !c3.item && !c3.vendor && c3.cu == null && (await p.inputValue('#psPlan')) === 'F1 계획 글' && (await p.inputValue('#psReason')) === 'F1 사유 글', c3);
+  await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=item'; }); await p.waitForTimeout(600);
+  await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=vend'; }); await p.waitForTimeout(600);
+  const c4 = await ctxOf();
+  T('F1e', '결함1: 같은 계정 안 보기(품목별->거래처별) 전환 시 선택 칸이 없으면 품목·단가 없음', !c4.item && c4.cu == null && /5029/.test(c4.account), c4);
+  // 결함1 저장 payload: 다른 계정에서 저장하면 이전 품목이 안 실림
+  await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=item'; }); await p.waitForTimeout(600);
+  await p.locator('#r10HmMap [data-r10hc]:not([data-chg=""])').first().click(); await p.waitForTimeout(300);
+  const oldItem = (await ctxOf()).itemCode;
+  await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForTimeout(400);
+  await p.locator('.r10-row[data-issue]').nth(oth).click(); await p.waitForTimeout(500);
+  const calls0 = t.m.ctl.calls.length;
+  await p.check('input[name=psMethod][value="사용량 절감"]'); await p.fill('#psTgt', '2'); await p.waitForTimeout(150);
+  const pl = await p.evaluate(() => { const c = window.COST1112_SIDE.ctx(); return { acc: c.account, code: c.code }; });
+  T('F1f', '결함1: 다른 계정에서 저장될 맥락(계정·코드)은 현재 화면 것, 이전 품목코드 아님', pl.acc !== c1.account && !!oldItem && (await ctxOf()).itemCode !== oldItem, { pl, oldItem });
+  // ---- 결함 2: 업체 상세 ----
+  await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=vend'; }); await p.waitForTimeout(500);
+  const vd = await p.evaluate(() => { const L = (typeof vendAccounts === 'function') ? vendAccounts() : []; const a = L[0]; return a ? { va: a.code, vv: a.vend[0].code, an: a.name, vn: a.vend[0].name } : null; });
+  await p.evaluate(h => { location.hash = h; }, `#div=prod&s=3&a=vd&va=${vd.va}&vv=${vd.vv}`); await p.waitForTimeout(700);
+  const c5 = await ctxOf();
+  T('F2a', '결함2: 업체 상세에서 계정 자리 = 계정(코드), 거래처 = 그 업체 이름', c5.account === `${vd.an}(${vd.va})` && c5.vendor === vd.vn && c5.vendor !== '전체', { c5, vd });
+  await p.check('input[name=psMethod][value="기타"]'); await p.fill('#psPlan', 'F2 계획'); await p.fill('#psReason', 'F2 사유');
+  const pay = await p.evaluate(async () => { const o = []; const orig = V5.api; V5.api = function (u, m, b) { if (m === 'POST') o.push(b); return Promise.reject(Object.assign(new Error('stop'), { kind: 'x' })); }; document.getElementById('psSave').click(); await new Promise(r => setTimeout(r, 400)); V5.api = orig; return o[0]; });
+  T('F2b', '결함2: 업체 상세 저장 payload = account 계정(코드), vendor 그 업체, account_code 계정코드', pay && pay.plan.account === `${vd.an}(${vd.va})` && pay.plan.vendor === vd.vn && pay.account_code === vd.va, pay && { a: pay.plan.account, v: pay.plan.vendor, c: pay.account_code });
+  await p.evaluate(() => { document.getElementById('psPlan').value = ''; }); 
+  await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForTimeout(300);
+  await p.evaluate(() => { localStorage.removeItem('cost1112_plan_draft'); }); await p.reload(); await p.waitForSelector('button[data-div]', { timeout: 15000 }); await p.waitForFunction(() => window.R10_READY === true); await p.waitForTimeout(500);
+  // 이후 기존 시험을 위해 입력값을 다시 채움
+  await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=item'; }); await p.waitForTimeout(600);
+  await p.locator('#r10HmMap [data-r10hc]:not([data-chg=""])').first().click(); await p.waitForTimeout(300);
+  await p.check('input[name=psMethod][value="단가절감"]'); await p.fill('#psTgt', '100000'); await p.fill('#psPlan', '[COST1112 테스트] 삭제 예정 - 단가 재협상'); await p.fill('#psReason', '[COST1112 테스트] 사유: 최근 3분기 단가 상승');
   // ---- 저장 ----
   await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=item'; }); await p.waitForTimeout(600);
   await p.locator('#r10HmMap [data-r10hc]:not([data-chg=""])').first().click(); await p.waitForTimeout(300);

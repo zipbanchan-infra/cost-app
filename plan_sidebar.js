@@ -19,12 +19,12 @@ function ctx(){const o={account:'',code:'',vendor:'',item:'',itemCode:'',cu:null
  const st=g('st');if(!st)return o;o.div=st.div;
  try{const R=window.R10CHART;const H=R&&R.HM;
   if(st.s===3&&st.a==='price'&&st.div==='prod'){const it=g('pItem')();if(it){const u=g('pchg')(it,st.cmp);o.item=it.n;o.itemCode=it.c;o.cu=u.cu;o.unit=it.u||'';o.account='원재료 단가';o.where=it.n;}}
-  else if(st.s>=2&&st.a&&st.a!=='price'){const i=g('cur')();if(i){o.account=i.title+(i.code&&/^[0-9]{4}$/.test(i.code)?`(${i.code})`:'');o.code=/^[0-9]{4}$/.test(i.code||'')?i.code:'';o.where=i.title;
-    let m=i.m;const row=st.s===3&&H&&H.sel?H.rows.find(r=>r.key===H.sel):null;
+  else if(st.a==='vd'&&st.s>=2){const {a,v}=g('vdData')();o.account=`${a.name}(${a.code})`;o.code=a.code;o.vendor=v.name;o.where=`${a.name} · ${v.name}`;const x=g('cmpM')(v.m);o.ratio=x.rc;}
+  else if(st.s>=2&&st.a&&st.a!=='price'&&st.a!=='vd'){const i=g('cur')();if(i){o.account=i.title+(i.code&&/^[0-9]{4}$/.test(i.code)?`(${i.code})`:'');o.code=/^[0-9]{4}$/.test(i.code||'')?i.code:'';o.where=i.title;
+    let m=i.m;const live=st.s===3&&H&&H.sel&&H.id===[st.div,st.a,st.va,st.vv,st.pm,H.kind].join('|')&&!!document.getElementById('r10HmMap');const row=live?H.rows.find(r=>r.key===H.sel):null;
     if(row){m=row.m;o.cu=row.cu==null?null:row.cu;o.unit=row.unit||'';if(H.kind==='vend'){o.vendor=row.name;}else{o.item=row.name;o.itemCode=row.key;if(row.vns&&row.vns.length===1)o.vendor=row.vns[0];}o.where=`${i.title} · ${row.name}`;}
     else if(st.v&&st.s===3){o.vendor='';}
     if(m){const x=g('cmpM')(m);o.ratio=x.rc;}}}
-  else if(st.a==='vd'&&st.s>=2){const {a,v}=g('vdData')();o.account=`${a.name}(${a.code})`;o.code=a.code;o.vendor=v.name;o.where=`${a.name} · ${v.name}`;const x=g('cmpM')(v.m);o.ratio=x.rc;}
  }catch(e){}
  return o;}
 
@@ -79,7 +79,7 @@ async function submit(){if(busy)return;const c=ctx();say('');$('psReasonErr').te
  const tg=parseNum(D.target);if(tg.err){if(te)te.textContent=tg.err;say(tg.err,'err');return;}
  if(D.method==='사용량 절감'&&tg.v!=null&&tg.v>100){if(te)te.textContent='목표 비율은 0~100 사이로 적어 주세요.';say('목표 비율은 0~100 사이로 적어 주세요.','err');return;}
  busy=true;$('psSave').disabled=true;say('시트 상태를 확인하는 중이에요');
- try{const p=payload(c);
+ try{vals();const p=payload(c);
   say('저장하는 중이에요');
   const o=await V5.api('/api/plans','POST',p);if(o&&o.plans)V5.ST.plans=o.plans;
   const back=await V5.api('/api/plans');const hit=(back.plans||[]).some(x=>String(x.id)===String(o.id));
