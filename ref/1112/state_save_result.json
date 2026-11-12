@@ -110,22 +110,22 @@
     "after_json"
    ],
    [
-    17944724219721,
-    17944724219600,
+    17944789232121,
+    17944789232010,
     "create",
     "jang_hoyeon@sannamchon.co.kr",
-    "2026-11-12 17:33",
+    "2026-11-12 19:22",
     "",
-    "{\"id\":17944724219600,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"아워팩 주식회사\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"item_code\\\":\\\"ZIP_S_6108\\\",\\\"item\\\":\\\"10103\\\",\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원 (현재 단가 49원)\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 17:33\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"created_name\":\"장호연\"}"
+    "{\"id\":17944789232010,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"아워팩 주식회사\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"item_code\\\":\\\"ZIP_S_6108\\\",\\\"item\\\":\\\"10103\\\",\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원 (현재 단가 49원)\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 19:22\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"created_name\":\"장호연\"}"
    ],
    [
-    17944724220612,
-    17944724219600,
+    17944789233022,
+    17944789232010,
     "delete",
     "jang_hoyeon@sannamchon.co.kr",
-    "2026-11-12 17:33",
-    "{\"id\":17944724219600,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"아워팩 주식회사\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"item_code\\\":\\\"ZIP_S_6108\\\",\\\"item\\\":\\\"10103\\\",\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원 (현재 단가 49원)\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 17:33\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"\",\"deleted_at\":\"\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"\"}",
-    "{\"id\":17944724219600,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"아워팩 주식회사\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"item_code\\\":\\\"ZIP_S_6108\\\",\\\"item\\\":\\\"10103\\\",\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원 (현재 단가 49원)\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 17:33\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"jang_hoyeon@sannamchon.co.kr\",\"deleted_at\":\"2026-11-12 17:33\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"장호연\"}"
+    "2026-11-12 19:22",
+    "{\"id\":17944789232010,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"아워팩 주식회사\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"item_code\\\":\\\"ZIP_S_6108\\\",\\\"item\\\":\\\"10103\\\",\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원 (현재 단가 49원)\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 19:22\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"\",\"deleted_at\":\"\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"\"}",
+    "{\"id\":17944789232010,\"division_id\":\"PROD\",\"account_code\":\"5029\",\"target_period\":\"26Q4\",\"content\":\"{\\\"account\\\":\\\"부재료비(5029)\\\",\\\"vendor\\\":\\\"아워팩 주식회사\\\",\\\"method\\\":\\\"단가절감\\\",\\\"target\\\":\\\"목표 금액 입력 필요\\\",\\\"target_amount_krw\\\":null,\\\"due\\\":\\\"2026-12-31\\\",\\\"basis\\\":\\\"[COST1112 테스트] 사유: 최근 3분기 단가 상승\\\",\\\"turns\\\":[],\\\"item_code\\\":\\\"ZIP_S_6108\\\",\\\"item\\\":\\\"10103\\\",\\\"memo\\\":\\\"[COST1112 테스트] 삭제 예정 - 단가 재협상\\\\n목표 단가 100,000원 (현재 단가 49원)\\\",\\\"state\\\":\\\"계획\\\"}\",\"status\":\"초안\",\"created_by\":\"jang_hoyeon@sannamchon.co.kr\",\"created_at\":\"2026-11-12 19:22\",\"page\":\"절감계획 사이드바\",\"is_example\":0,\"updated_by\":\"\",\"updated_at\":\"\",\"deleted_by\":\"jang_hoyeon@sannamchon.co.kr\",\"deleted_at\":\"2026-11-12 19:22\",\"created_name\":\"장호연\",\"updated_name\":\"\",\"deleted_name\":\"장호연\"}"
    ]
   ]
  },
@@ -135,7 +135,7 @@
   "ok": true,
   "d": [
    {
-    "id": 17944724219600,
+    "id": 17944789232010,
     "vendor": "아워팩 주식회사",
     "due": "2026-12-31",
     "method": "단가절감",
@@ -158,7 +158,7 @@
   "ok": true,
   "d": {
    "del": false,
-   "deleted_at": "2026-11-12 17:33"
+   "deleted_at": "2026-11-12 19:22"
   }
  },
  {
