@@ -17,6 +17,7 @@ let bad = 0, n = 0; const fail = (m, d) => { bad++; console.log('MISMATCH', m, J
   console.log('원천 파일:', SRC, '/ 탭 D_구매월 PROD', Object.keys(byItem).length, '품목');
   const t = await open(); const p = t.p;
   for (const [axis, hash] of [['item', '#div=prod&s=3&a=5029&ax=item'], ['vend', '#div=prod&s=3&a=5029&ax=vend']]) {
+    await p.evaluate(() => { R10CHART.SCOPE.v = 'all'; });  /* COST1113: 전체 품목 기준으로 1112 대조 유지 */
     await p.evaluate(h => { location.hash = h; }, hash); await p.waitForTimeout(700);
     const rows = await p.evaluate(() => R10CHART.HM.rows.map(r => ({ key: r.key, size: r.size, chg: r.pchg, m: r.m, pser: r.pser })));
     const cells = await p.$$eval('#r10HmMap [data-r10hc]', e => e.map(x => ({ key: x.dataset.r10hc, amt: +x.dataset.amt, chg: x.dataset.chg === '' ? null : +x.dataset.chg })));
@@ -32,7 +33,7 @@ let bad = 0, n = 0; const fail = (m, d) => { bad++; console.log('MISMATCH', m, J
       if (axis === 'item') sc = chg(m);
       else { // 거래처 단가 등락 = 품목별 단가 변화를 이번 수량으로 가중
         let imp = 0, den = 0; for (const [it, im] of Object.entries(byVend[r.key] || {})) { if (!itemSet.has(it)) continue; const [ca, cq] = sum(im, CUR), [pa, pq] = sum(im, PREV); const cu = cq > 0 ? ca / cq : null, pu = pq > 0 ? pa / pq : null; if (cu != null && pu > 0) { imp += cq * (cu - pu); den += cq * pu; } } sc = den > 0 ? imp / den * 100 : null; }
-      n++; if (!near(sc, r.chg, 1e-6)) fail(axis + ' 단가등락 ' + r.key, { src: sc, app: r.chg });
+      if (axis === 'item') { n++; if (!near(sc, r.chg, 1e-6)) fail(axis + ' 단가등락 ' + r.key, { src: sc, app: r.chg }); }  /* 거래처 단가 등락 규칙은 COST1113 에서 바뀌어 numbers_cost1113.js 가 대조 */
       for (const y of ['2601', '2602', '2603', '2604', '2605', '2606', '2607', '2608', '2609']) {   // 추세 월별 금액
         const sv = m[y] ? m[y][0] : undefined; const av = r.m[y]; n++; if (!near(sv == null ? null : sv, av == null ? null : av, 0.5)) fail(axis + ' 추세금액 ' + r.key + ' ' + y, { src: sv, app: av });
         if (axis === 'item' && r.pser) { const sp = m[y] && m[y][1] > 0 ? m[y][0] / m[y][1] : undefined; n++; if (!near(sp == null ? null : sp, r.pser[y] == null ? null : r.pser[y], 1e-6)) fail('추세단가 ' + r.key + ' ' + y, { src: sp, app: r.pser[y] }); } }

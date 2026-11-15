@@ -116,7 +116,7 @@ body.r10 .r10-leg .r10-lh{color:#8A8A8A;margin-left:auto}
 body.r10 .r10-gw{margin-top:24px;padding-top:16px;border-top:1px solid #EBEBEB}
 body.r10 .r10-gh{padding-bottom:12px}
 body.r10 .r10-st2{font-size:15px;line-height:24px;font-weight:700;color:#303030}
-body.r10 .r10-grid{display:grid;grid-template-columns:136px repeat(3,minmax(0,1fr)) 8px repeat(9,minmax(0,1fr));gap:4px;align-items:center}
+body.r10 .r10-grid{display:grid;grid-template-columns:140px repeat(3,minmax(0,1fr)) 8px repeat(10,minmax(0,1fr));gap:4px;align-items:center}
 body.r10 .r10-gm{font-size:12px;line-height:16px;color:#616161;text-align:center;white-space:nowrap}
 body.r10 .r10-gm.cur{color:#303030;font-weight:650}
 body.r10 .r10-gl{height:32px;padding:0 8px;border:none;border-radius:8px;background:none;font-family:inherit;font-size:13px;line-height:20px;font-weight:550;color:#303030;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
@@ -128,7 +128,7 @@ body.r10 .r10-gc.gap,body.r10 .r10-gm.gap{background:none;border-left:1px dashed
 body.r10 .r10-gleg i{width:12px;height:12px}
 
 @container main (max-width:720px){
- body.r10 .r10-grid{grid-template-columns:96px repeat(3,minmax(0,1fr)) 4px repeat(9,minmax(0,1fr))}
+ body.r10 .r10-grid{grid-template-columns:96px repeat(3,minmax(0,1fr)) 4px repeat(10,minmax(0,1fr))}
  body.r10 .r10-gl{padding:0 4px;font-size:12px}
  body.r10 .r10-leg .r10-lh{margin-left:0}
 }
@@ -151,3 +151,33 @@ body.r10 .r10-trs button{height:32px;padding:0 14px;border:0;background:#fff;fon
 body.r10 .r10-trs button.on{background:#303030;color:#fff}
 body.r10 .r10-trs button:disabled{color:#8A8A8A;cursor:not-allowed;background:#F7F7F7}
 body.r10 .r10-trw{display:block;margin-bottom:8px;font-size:12px;color:#616161}
+
+body.r10 .r10-scope{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}
+body.r10 .r10-scl{font-size:13px;color:#616161;margin-right:4px}
+body.r10 .r10-scope button{height:32px;padding:0 12px;border:1px solid #D4D4D4;border-radius:16px;background:#fff;font:inherit;font-size:13px;cursor:pointer}
+body.r10 .r10-scope button.on{background:#303030;color:#fff;border-color:#303030}
+
+body.r10 .r10-vc{width:100%;margin-top:12px;border-collapse:collapse;font-size:13px}
+body.r10 .r10-vc caption{text-align:left;font-weight:600;padding-bottom:6px}
+body.r10 .r10-vc th,body.r10 .r10-vc td{padding:6px 8px;border-top:1px solid #EBEBEB;text-align:left}
+body.r10 .r10-vc .num{text-align:right}
+
+body.r10 .r10-mv.none{font-size:11px;color:#8A8A8A;font-weight:400}
+body.r10 .r10-hc.rest{cursor:pointer}
+body.r10 .r10-hc.rest:hover{background:#E0E0E0}
+body.r10 .r10-hless{position:absolute;right:8px;bottom:8px;z-index:3;height:28px;padding:0 10px;border:1px solid #D4D4D4;border-radius:14px;background:#fff;font:inherit;font-size:12px;cursor:pointer}
+
+/* UXFIX2: 지도 아래 접기 줄, 소형 칸 라벨, 신규(비교 단가 없음) 칸은 빗금으로 회색 3종 구분 */
+body.r10 .r10-hmbar{display:flex;justify-content:flex-end;margin-top:6px}
+body.r10 .r10-hless{position:static;height:30px;padding:0 12px;border:1px solid #D4D4D4;border-radius:15px;background:#fff;font:inherit;font-size:13px;cursor:pointer}
+body.r10 .r10-hc .n.mini{font-size:10px;line-height:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+body.r10 .r10-hc{padding:4px 6px}
+body.r10 .r10-hc .c.why{font-size:12px;color:#303030;font-weight:500}
+body.r10 .r10-hc.bk-n,body.r10 .r10-leg i.hatch{background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.10) 0 5px,rgba(255,255,255,.55) 5px 10px)!important}
+body.r10 .r10-hc.bk-z{background:#B0B4B9}
+
+/* UXFIX3: 작은 칸은 라벨을 숨기고 마우스를 올리면 풍선 설명 */
+.r10-hmtip{position:fixed;z-index:50;max-width:320px;padding:8px 10px;border-radius:8px;background:#303030;color:#fff;font-size:12px;line-height:18px;box-shadow:0 4px 12px rgb(0 0 0/.25);pointer-events:none}
+.r10-hmtip[hidden]{display:none}
+body.r10 .r10-hc .n{font-size:13px}
+body.r10 .r10-hc .c{font-size:12px}

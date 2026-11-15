@@ -21,3 +21,26 @@
 .plan-side .ps-b:disabled{background:#8A8A8A;cursor:wait}
 .plan-side .ps-msg{font-size:13px;line-height:19px;color:#616161}
 .plan-side .ps-msg.err{color:#B3261E}.plan-side .ps-msg.ok{color:#1B6E5A}.plan-side .ps-msg.blocked{color:#8A5A00}
+
+.plan-side .ps-tg{all:unset;display:flex;flex-direction:column;gap:4px;width:100%;cursor:pointer}
+.plan-side .ps-tgs{font-size:12px;color:#616161}
+.plan-side .ps-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plan-side .ps-est{margin:-4px 0 8px;font-size:13px;color:#1B6E5A;font-weight:600}
+.plan-side.ps-folded{height:auto;align-self:flex-start}
+.plan-side.ps-folded .ps-body,.plan-side.ps-folded .ps-s{display:none}
+
+/* UXFIX1114: H2 절감 예상 문구 · M2 필수 요약 · M3 전체 높이·본문 배경톤 */
+.plan-side{height:100vh;background:#EBEBEB;border-left:1px solid #D4D4D4}
+.plan-side.ps-folded{height:100vh;align-self:flex-start}
+.plan-side .ps-est{margin:8px 0 12px;padding:0}
+.plan-side .ps-est1{font-size:14px;font-weight:700;color:#1B6E5A;line-height:20px}
+.plan-side .ps-est1.warn{color:#8A5A00;font-weight:600}
+.plan-side .ps-est2{margin-top:2px;font-size:12px;line-height:18px;color:#4A4A4A}
+.plan-side .ps-sum{font-size:12px;line-height:18px;color:#616161}
+.plan-side .ps-sum.ok{color:#1B6E5A}
+.plan-side .ps-h{border-bottom-color:#D4D4D4}
+
+/* UXFIX2: 저장 영역은 칸 아래에 고정(스크롤해도 안 잘림) */
+.plan-side .ps-body{padding-bottom:12px}
+.plan-side .ps-foot{flex:none;display:flex;flex-direction:column;gap:6px;padding:10px 20px 14px;background:#EBEBEB;border-top:1px solid #D4D4D4}
+.plan-side.ps-folded .ps-foot{display:none}

@@ -3,17 +3,17 @@
 const ND='비교 기간 없음';
 const DB=window.R6_DATA;const ALLOWED=new Set(DB.allowed||[]);
 const {f,sg,man,esc,per,PMN}=V5;
-const P=['25Q3','26H1','26Q3'],PL={'25Q3':'2025 Q3','26H1':'2026 H1','26Q3':'2026 Q3'};
+const P=['25Q3','26H1','26Q3'],PL={'25Q3':'25Q3','26H1':'26H1','26Q3':'26Q3'};
 const STEPS=['이슈 고르기','원인 보기','자세히 보기','계획 확인'];
 const ym2=y=>y.slice(0,2)+'.'+y.slice(2);
 const pTot=(m,p)=>Object.entries(m||{}).filter(([y])=>per(y)===p).reduce((a,[,v])=>a+(Array.isArray(v)?v[0]:v),0);
 const tots=m=>Object.fromEntries(P.map(p=>[p,pTot(m,p)]));
 // 13:11 확정: 기본 비교 = 작년 3분기(25Q3) 대비, 상반기(26H1) 대비는 선택 · 길이가 다른 기간은 월평균으로 비교
-const CMP={h1:{l:'상반기(26H1) 대비',s:'26H1 대비',cur:['2607','2608','2609'],prev:['2601','2602','2603','2604','2605','2606'],cl:'2026 Q3',pl:'2026 H1',main:1},
- q3:{l:'작년 3분기(25Q3) 대비',s:'25Q3 대비',cur:['2607','2608','2609'],prev:['2507','2508','2509'],cl:'2026 Q3',pl:'2025 Q3',main:1},
- q4:{l:'작년 4분기(25Q4) 대비',s:'25Q4 대비',cur:['2607','2608','2609'],prev:['2510','2511','2512'],cl:'2026 Q3',pl:'2025 Q4'},   // r13 c2: 25Q4 는 보조(비교 월평균 cmpAvg)로 계산, 표의 25Q3·26H1·26Q3 세 열은 그대로
+const CMP={h1:{l:'상반기(26H1) 대비',s:'26H1 대비',cur:['2607','2608','2609'],prev:['2601','2602','2603','2604','2605','2606'],cl:'26Q3',pl:'26H1',main:1},
+ q3:{l:'작년 3분기(25Q3) 대비',s:'25Q3 대비',cur:['2607','2608','2609'],prev:['2507','2508','2509'],cl:'26Q3',pl:'25Q3',main:1},
+ q4:{l:'작년 4분기(25Q4) 대비',s:'25Q4 대비',cur:['2607','2608','2609'],prev:['2510','2511','2512'],cl:'26Q3',pl:'25Q4'},   // r13 c2: 25Q4 는 보조(비교 월평균 cmpAvg)로 계산, 표의 25Q3·26H1·26Q3 세 열은 그대로
  mom:{l:'전월',s:'전월 대비',cur:['2609'],prev:['2608'],cl:'2026-09',pl:'2026-08'},
- qoq:{l:'전분기',s:'전분기 대비',cur:['2607','2608','2609'],prev:['2604','2605','2606'],cl:'2026 Q3',pl:'2026 Q2'},
+ qoq:{l:'전분기',s:'전분기 대비',cur:['2607','2608','2609'],prev:['2604','2605','2606'],cl:'26Q3',pl:'26Q2'},
  m10:{l:'26.10 가마감(전월 대비)',s:'26.10 가마감 대비',cur:['2610'],prev:['2609'],cl:'2026-10 가마감',pl:'2026-09'}};
 const CK='r6dev_cmp';const CC=()=>CMP[st.cmp]||CMP.q3;
 const mval=v=>Array.isArray(v)?v[0]:v;
@@ -69,17 +69,17 @@ function parseHash(){const q=new URLSearchParams(location.hash.slice(1));const p
  if(st.s>1&&!st.a){if(isP())setBasesFor();else V5.setBases('online',[['online','온라인 매출']],{online:OSALES.online});const I=issues();st.a=I.length?I[0].id:null;}}// 2단계 기본 이슈 = 1단계 목록 1위: 비율 분모(기준)를 먼저 맞춘 뒤 고름(예전엔 분모가 비어 순위가 어긋나 '14위 원재료비'가 열렸어요)
 function go(o){const cur={div:st.div,s:st.s,a:st.a,n:st.n,ch:st.ch,pm:st.pm,hm:st.hm,va:st.va,vv:st.vv};const nx=Object.assign(cur,o);const q=new URLSearchParams();Object.entries(nx).forEach(([k,v])=>{if(v!=null&&v!=='')q.set(k,v)});const h=q.toString();if(h===location.hash.slice(1)){parseHash();render();}else location.hash=h;}
 // ---------- 기준(분모) ----------
-function setBasesFor(){if(isP()){V5.setBases('prod',[['prod','생산매출'],['net','출고매출 합계']],PD.salesM);return;}
+function setBasesFor(){if(isP()){/* COST1113 3-8(2026-11-13 09:16 본부장님 결정): 경영지원 기본 기준 = 출고매출 합계 */if(st.div==='mgmt')V5.setBases('mgmt',[['net','출고매출 합계'],['prod','생산매출']],PD.salesM);else V5.setBases('prod',[['prod','생산매출'],['net','출고매출 합계']],PD.salesM);return;}
  const ch=st.s===3?curCh():null;const withCh=ch&&ch!=='ONLINE_COMMON';
  V5.setBases('online',st.s===3&&ch?[['online','온라인 매출'],['channel','채널 매출']]:[['online','온라인 매출']],{online:OSALES.online,channel:withCh?(OSALES.ch[ch]||{}):{}});}
 function vPb(cost,p,b){if(amtMode())return f(cost/PMN[p]);const s=V5.salesP(p,b);return V5.pct(cost,s);}
 function dPb(m,b){const x=cmpM(m,b);if(x.nd)return ND;if(amtMode())return manS(x.d);return x.pp==null?V5.NOS:ppS(x.pp);}
 // ---------- 이슈 모델 ----------
 function issues(all){let L;
- if(isP()){L=PD.acc.filter(a=>!LABOR[a.code]).map(a=>{const vs=(PD.vend[a.code]||[]).map(v=>({id:v.code,name:v.name,c:tots(v.m),m:v.m}));return {id:a.code,title:a.name,code:a.code,c:tots(a.m),m:a.m,drivers:vs,dl:'업체'}});}
+ if(isP()){L=PD.acc.filter(a=>!LABOR[a.code]).map(a=>{let vs=(PD.vend[a.code]||[]).map(v=>({id:v.code,name:v.name,c:tots(v.m),m:v.m}));if(a.code==='5029'&&st.div==='prod'&&window.R10CHART&&R10CHART.subVendors){const sv=R10CHART.subVendors();if(sv.length)vs=sv.map(v=>({id:v.code,name:v.name,c:tots(v.m),m:v.m,buy:true}));}/* COST1113: 원장 거래처가 '미기재' 1곳뿐인 부재료비는 구매현황 거래처로 나눠요 */return {id:a.code,title:a.name,code:a.code,c:tots(a.m),m:a.m,drivers:vs,dl:'업체'}});}
  else{const V=view();L=OITEMS.map(it=>({id:it,title:it,code:OACC[it],c:Object.fromEntries(P.map(p=>[p,ocost(V,'ALL',p,it)])),m:oMonthly(V,'ALL',it),drivers:CH.map(([id,n])=>({id,name:n,c:Object.fromEntries(P.map(p=>[p,ocost(V,id,p,it)])),m:oMonthly(V,id,it)})).filter(d=>P.some(p=>d.c[p])),dl:'채널'}));}
  const dk=d=>d.nd?-1e18:onR()?(d.pp==null?-1e9:d.pp):d.d;// 자료 없음은 증감 순위 맨 뒤 · U2: 온라인 비율 모드는 온라인 매출 대비 %p 순(워터폴·시그널과 같은 기준)
- L.forEach(i=>{i.x=cmpM(i.m);i.d=i.x.d;i.r=i.x.r;i.pp=i.x.pp;i.nd=i.x.nd;i.drivers.forEach(d=>{d.x=cmpM(d.m);d.d=d.x.d;d.pp=d.x.pp;d.nd=d.x.nd});i.drivers.sort((x,y)=>dk(y)-dk(x));});
+ L.forEach(i=>{i.x=cmpM(i.m);i.d=i.x.d;i.r=i.x.r;i.pp=i.x.pp;i.nd=i.x.nd;i.drivers.forEach(d=>{d.x=cmpM(d.m);if(d.buy&&d.x.nd){/* 구매현황 거래처는 전기 구매 자료가 있어서, 전기에 안 샀으면 '자료 없음'이 아니라 새 거래처(전기 0원)예요 */d.x.nd=false;d.x.ap=0;d.x.pa=0;d.x.d=d.x.ac;d.x.r=null;}d.d=d.x.d;d.pp=d.x.pp;d.nd=d.x.nd});i.drivers.sort((x,y)=>dk(y)-dk(x));});
  const key=i=>i.nd?-1e18:st.sort==='rate'?(i.r==null?-1e9:i.r):(amtMode()?i.d:(i.pp==null?-1e9:i.pp));
  return (all?L:L.filter(i=>!i.nd&&(onR()?i.pp!=null&&i.pp>0:i.d>0))).sort((x,y)=>key(y)-key(x));}// R6ND-7: 온라인 비율 모드는 온라인 매출 대비 %p 가 오른 항목만(순서와 같은 기준)
 function cur(){if(st.a==='price'&&st.div==='prod')return priceIssue();if(st.a==='vd'){const {a,v}=vdData();// U4: 업체 상세의 2단계(이전·단계 버튼) = 그 업체 하나의 증감. 예전엔 비교값 없이 d:0 이라 비율 모드 핵심 수치가 '매출 데이터 없음'으로 보였어요
@@ -89,9 +89,9 @@ function rankOf(id){return issues().findIndex(x=>x.id===id)+1}
 function keyTxt(i){if(i.nd)return `<span title="${CC().pl} 비교 기간 없음 · 증감 계산 안 해요">${ND}</span>`;return amtMode()?`월 ${manS(i.d)}${i.r!=null?` (${i.r>=0?'+':''}${i.r.toFixed(1)}%)`:''}`:(i.pp==null?V5.NOS:ppS(i.pp));}
 function dTxt(d){if(d.nd)return ND;return amtMode()?manS(d.d):(d.pp==null?V5.NOS:ppS(d.pp));}
 function reasonTxt(i){const t=i.drivers.filter(dUp)[0];const nn=i.drivers.filter(d=>d.nd).length;
- if(isP()){if(!i.drivers.length)return `월평균 ${CC().pl}보다 ${i.r!=null?pctS(i.r):''} · 거래처 줄 없음`;
-   return t?`${t.name} 매입이 월 ${manS(t.d)} 늘었어요`:nn?`늘어난 업체를 찾으려면 ${CC().pl} 비교 기간 없는 업체 ${nn}곳이 ${ND}이라 알 수 없어요`:'업체별로는 늘어난 곳이 없어요';}
- if(onR())return t?`${t.name} 비율이 ${ppS(t.pp)} 올랐어요 · ${OBL} 기준`:nn?`비율이 오른 채널을 찾으려면 ${CC().pl} 비교 기간 없는 채널 ${nn}곳이 ${ND}이라 알 수 없어요`:`채널별로는 ${OBL} 대비 비율이 오른 곳이 없어요`;
+ if(isP()){if(!i.drivers.length)return `월평균 ${CC().pl}보다 ${i.r!=null?pctS(i.r):''} · 거래처 아직 없음`;
+   return t?`${t.name} 매입이 월 ${manS(t.d)} 늘었어요`:nn?`비교 못 하는 업체 ${nn}곳(작년 기록 없음)`:'업체별로는 늘어난 곳이 없어요';}
+ if(onR())return t?`${t.name} 비율이 ${ppS(t.pp)} 올랐어요 · ${OBL} 기준`:nn?`비교 못 하는 업체 ${nn}곳(작년 기록 없음)`:`채널별로는 ${OBL} 대비 비율이 오른 곳이 없어요`;
  return t?`${josa(t.name,'에서','에서')} 월 ${manS(t.d)} 늘었어요`:nn?`늘어난 채널을 찾으려면 ${CC().pl} 비교 기간 없는 채널 ${nn}곳이 ${ND}이라 알 수 없어요`:'채널별로는 늘어난 곳이 없어요';}
 // U2: 온라인 비율 기준 = 온라인 매출(비묶음 채널 net_sales 합). 온라인 비율 모드에서 '늘어난 채널'은 이 기준 %p 로 고른다
 const OBL='온라인 매출';
@@ -104,7 +104,7 @@ function baseSeg(){return `<span class="seg" id="baseSeg">${['q3','q4','h1'].map
 function auxSeg(){return `<span class="seg aux" id="auxSeg">${['mom','qoq'].map(k=>`<button data-cmp="${k}" class="${st.cmp===k?'on':''}" title="보조 비교">${CMP[k].l}</button>`).join('')}</span>`;}
 function stepper(){return `<div class="stepper" id="stepper">${STEPS.map((t,k)=>{const n=k+1;return `<button class="stp${n===st.s?' on':''}${n<st.s?' done':''}" data-step="${n}" ${n===st.s?'aria-current="step" ':''}${n>1&&!st.a&&n!==st.s?'disabled':''}><span class="no">${n}</span>${t}</button>`}).join('')}</div>`;}
 function viewSeg(){return `<span class="seg" id="viewSeg"><button data-view="list" class="${st.hm?'':'on'}">목록</button><button data-view="hm" class="${st.hm?'on':''}">히트맵</button></span>`;}
-function guide(txt,btns){return `<div class="guide" id="guide"><div class="gx"><div class="gk">지금 할 일 · ${st.s}/4</div><div class="gt" id="guideText">${txt}</div></div><div class="gb">${btns}</div></div>`;}
+function guide(txt,btns){return `<div class="guide" id="guide"><div class="gx"><div class="gk">지금 할 일 · ${st.s===4?3:st.s===1?1:2}/3</div><div class="gt" id="guideText">${txt}</div></div><div class="gb">${btns}</div></div>`;}
 const prevBtn=()=>st.s>1?`<button class="btn sec sm" id="prevBtn">‹ 이전</button>`:'';
 const nextBtn=t=>`<button class="btn pri sm" id="nextBtn">${t} →</button>`;
 function fold(id,label,body){const o=st.open.has(id);return `<button class="fold" data-fold="${id}" aria-expanded="${o}">${label} <span class="cv">⌄</span></button>${o?`<div class="foldb" id="fb-${id}">${body}</div>`:''}`;}
@@ -125,7 +125,7 @@ const fg=k=>k==='z'||k==='n'?'#303030':'#fff';
 const TOPMIN=500000; // TOP 목록은 이번 기간 50만원 이상만 [추정 기준]
 const sumM=(m,ys)=>ys.reduce((a,y)=>{const v=m[y];if(v){a[0]+=v[0];a[1]+=v[1]}return a},[0,0]);
 const sumA=(m,ys)=>ys.reduce((a,y)=>a+(m[y]||0),0);
-// 단가: 수량이 있으면 금액 0도 진짜 0원(샘플 등). 비교 기간에 구매 수량이 없으면(줄 없음·취소로 0) 단가 자료 없음 = isNew(입력 필요)
+// 단가: 수량이 있으면 금액 0도 진짜 0원(샘플 등). 비교 기간에 구매 수량이 없으면(아직 없음·취소로 0) 단가 자료 없음 = isNew(입력 필요)
 function pchg(it,cmp){const C=CMP[cmp];const [ca,cq]=sumM(it.m,C.cur),[pa,pq]=sumM(it.m,C.prev);const cu=cq>0?ca/cq:null,pu=pq>0?pa/pq:null;return {ca,cq,pa,pq,cu,pu,chg:cu!=null&&pu>0?(cu/pu-1)*100:null,isNew:!(pq>0)};}
 function heat(scope,cmp){const S=SCOPE[scope];const its=M2.items.filter(i=>S.g.includes(i.g)).map(i=>({...i,...pchg(i,cmp)})).filter(i=>i.ca>0);
  const avgOf=L=>{const c=L.filter(i=>i.chg!=null);const num=c.reduce((a,i)=>a+i.ca,0),den=c.reduce((a,i)=>a+i.cq*i.pu,0);return den?(num/den-1)*100:null};
@@ -171,7 +171,7 @@ function hmModel(){const k=st.hm,cmp=st.cmp,C=CC();let secs,title,note,kind='cos
  let avg,pp=null;if(kind==='price'){avg=heat(k==='price'?'raw':'pack',cmp).avg}else{const c=all.filter(i=>i.chg!=null);const pa=c.reduce((a,i)=>a+i.pa,0)/C.prev.length,ca=c.reduce((a,i)=>a+i.ca,0)/C.cur.length;avg=pa?(ca/pa-1)*100:null;
   const cm=all.filter(i=>!i.isNew);// 합계 비율 변화도 비교 자료 있는 칸만(금액 등락과 같은 기준)
   const sc=salesSum(C.cur),sp=salesSum(C.prev),ta=cm.reduce((a,i)=>a+i.ca,0),tp=cm.reduce((a,i)=>a+(i.pa||0),0);pp=sc&&sp&&cm.length?ta/sc*100-tp/sp*100:null;}
- return {k,kind,title,note,secs,all,tot,avg,pp,pm,bf:pm?bucketP:bucket,lab:pm?(i=>i.isNew?ND:i.pp==null?'줄 없음':ppS(i.pp)):chgLbl,cvS:pm?ppS:pctS};}
+ return {k,kind,title,note,secs,all,tot,avg,pp,pm,bf:pm?bucketP:bucket,lab:pm?(i=>i.isNew?ND:i.pp==null?'아직 없음':ppS(i.pp)):chgLbl,cvS:pm?ppS:pctS};}
 function squarify(items,x,y,w,h){const out=[];const total=items.reduce((a,b)=>a+b.v,0);if(!total||w<=0||h<=0)return out;const sc=w*h/total;let r=items.map(it=>({it,a:it.v*sc}));
  while(r.length){const sh=Math.min(w,h);const worst=row=>{const s=row.reduce((a,b)=>a+b.a,0);const mx=Math.max(...row.map(q=>q.a)),mn=Math.min(...row.map(q=>q.a));return Math.max(sh*sh*mx/(s*s),(s*s)/(sh*sh*mn))};
   let row=[r[0]],i=1;while(i<r.length&&worst(row.concat([r[i]]))<=worst(row)){row.push(r[i]);i++}const s=row.reduce((a,b)=>a+b.a,0);
@@ -197,7 +197,7 @@ function hmSide(H){const ok=H.all.filter(i=>i.cv!=null&&i.ca>=TOPMIN&&i.click);c
  const w=H.pm?'비율':'';return `<div class="tm-side3" id="tmSide"><div class="tm-card"><div class="ct">분류별 ${H.pm?'비율 변화':'등락률'}</div>${H.secs.map(x=>`<div class="tm-row" title="${esc(x.s)} ${f(x.tot)}원"><span class="rn">${esc(x.s)}</span>${pill(x.cv,x.nd)}</div>`).join('')||'<div class="empty">분류가 없어요</div>'}</div>
  <div class="tm-card" id="topUp"><div class="ct">${w||'상승률'} ${w?'상승 ':''}TOP</div>${lst(up,`${CC().pl}보다 오른 칸이 없어요`)}</div><div class="tm-card" id="topDn"><div class="ct">${w||'하락률'} ${w?'하락 ':''}TOP</div>${lst(dn,`${CC().pl}보다 내린 칸이 없어요`)}${nds?`<div class="sub" id="topNd" style="margin-top:8px">${CC().pl} 비교 기간 없는 ${nds}칸은 ${ND}이라 순위에서 뺐어요</div>`:''}</div></div>`;}
 function hmView(){const H=hmModel();const C=CC();
- return `${guide(!H.secs.length?`이 히트맵은 그릴 칸이 없어요. 위에서 다른 종류를 골라 보세요.`:H.pm?`칸 색이 진한 빨강일수록 ${st.div==='online'?OBL:'매출'} 대비 비율이 많이 올랐어요. 칸을 누르면 다음 단계로 가요.`:`칸 색이 진한 빨강일수록 많이 늘었어요. 칸을 누르면 다음 단계로 가요.`,'')}
+ return `${guide(!H.secs.length?`그릴 칸이 없어서 위에서 다른 종류를 골라야 해요.`:H.pm?`칸을 누르면 그 계정 세부내역으로 가요.`:`칸을 누르면 그 계정 세부내역으로 가요.`,'')}
  <div class="vhead"><div><div class="pg-eyebrow">${divName()} · 히트맵 · ${C.s}</div><div class="pg-h">${esc(H.title)} <span class="pg-n num" id="heatSum" title="${C.cl} 합계 ${f(H.tot)}원 · 금액 ${pctS(H.avg)}">${amtMode()?man(H.tot)+' · '+pctS(H.avg):V5.pct(H.tot,salesSum(C.cur))+' · '+(H.kind==='cost'?ppS(H.pp):'단가 '+pctS(H.avg))}</span></div></div></div>
  <div class="hmkinds" id="hmKinds">${hmKinds().map(([k,l])=>`<button class="chipb${st.hm===k?' on':''}" data-hm="${k}">${l}</button>`).join('')}</div>
  <div class="tm-ctrl"><span class="vtl">보조</span>${auxSeg()}
@@ -207,21 +207,21 @@ function priceIssue(){const H=heat('raw',st.cmp);const imp=H.its.filter(i=>i.chg
  const m={};M2.items.filter(i=>i.g==='ZIP_M').forEach(i=>Object.entries(i.m).forEach(([y,v])=>m[y]=(m[y]||0)+v[0]));
  return {id:'price',title:'원재료 단가',code:'ZIP_M',H,imp,n15:H.its.filter(i=>i.chg!=null&&i.chg>=15).length,m,c:tots(m),drivers:[],dl:'자재'};}
 function priceRow(){const pi=priceIssue();const po=st.open.has('im-price');const top=po?pi.imp:pi.imp.slice(0,2);
- return `<div class="issue" id="priceIssue"><button class="icard" data-price="1"><span class="rank">·</span><span class="ibody"><span class="ititle">원재료 단가</span><div class="ireason">${pi.H.its.length?`${pi.n15}개 자재 +15% 이상 · ${CC().s}`:`${CC().cl} 원재료 구매 줄 없음`}</div><div class="ikey num">${pi.H.its.length?'평균 '+pctS(pi.H.avg):'-'}</div></span><span class="chev">›</span></button>
+ return `<div class="issue" id="priceIssue"><button class="icard" data-price="1"><span class="rank">·</span><span class="ibody"><span class="ititle">원재료 단가</span><div class="ireason">${pi.H.its.length?`${pi.n15}개 자재 +15% 이상 · ${CC().s}`:`${CC().cl} 원재료 구매 아직 없음`}</div><div class="ikey num">${pi.H.its.length?'평균 '+pctS(pi.H.avg):'-'}</div></span><span class="chev">›</span></button>
  <div class="arw"></div><div class="imp">${top.map(i=>`<div class="ir" title="${esc(i.n)} ${f(i.pu)}→${f(i.cu)}원"><span class="nm2">${esc(i.n)}</span><span class="dv num">${pctS(i.chg)}</span></div>`).join('')||'<div class="ir" id="priceNone"><span class="dv">단가가 오른 원재료가 없어요</span></div>'}${pi.imp.length>2?`<button class="im" data-imore="price" aria-expanded="${po}">${po?'접기':(pi.imp.length-2)+'개 더보기'}</button>`:''}</div></div>`;}
 function pItem(){return M2I[st.pm]||heat(st.scope,st.cmp).its[0];}
 const PMON3={'25Q3':['2507','2508','2509'],'26H1':['2601','2602','2603','2604','2605','2606'],'26Q3':['2607','2608','2609']};
 function uOf(m,ys){const [a,q]=sumM(m,ys);return q>0?a/q:null;}
 function priceTiles(it){const u={};Object.keys(PMON3).forEach(p=>u[p]=uOf(it.m,PMON3[p]));const cu=u['26Q3'];
- const tile=(p,k)=>{const v=u[p];const ch=v>0&&cu!=null?(cu/v-1)*100:null;return `<button class="pt3${st.cmp===k?' on':''}" data-cmp="${k}" id="pt-${k}" title="${PL[p]} 가중 단가(공급가액 합÷수량 합)${v!=null?'':' · 이 기간 구매 없음'}"><span class="k">${PL[p]} 단가</span><span class="v num">${v!=null?f(v)+'원':'줄 없음'}</span><span class="d num" id="pchg-${k}">${ch!=null?'2026 Q3 '+pctS(ch):v===0?'0원이라 등락률 계산 안 해요':'비교 기간 없음'}</span></button>`};
- return `<div class="ptiles" id="pTiles">${tile('25Q3','q3')}${tile('26H1','h1')}<div class="pt3 cur"><span class="k">2026 Q3 단가</span><span class="v num">${cu!=null?f(cu)+'원':'줄 없음'}</span><span class="d">${it.u?esc(it.u)+'당':'단위 없음'}</span></div></div>`;}
+ const tile=(p,k)=>{const v=u[p];const ch=v>0&&cu!=null?(cu/v-1)*100:null;return `<button class="pt3${st.cmp===k?' on':''}" data-cmp="${k}" id="pt-${k}" title="${PL[p]} 가중 단가(공급가액 합÷수량 합)${v!=null?'':' · 이 기간 구매 없음'}"><span class="k">${PL[p]} 단가</span><span class="v num">${v!=null?f(v)+'원':'아직 없음'}</span><span class="d num" id="pchg-${k}">${ch!=null?'26Q3 '+pctS(ch):v===0?'0원이라 등락률 계산 안 해요':'비교 기간 없음'}</span></button>`};
+ return `<div class="ptiles" id="pTiles">${tile('25Q3','q3')}${tile('26H1','h1')}<div class="pt3 cur"><span class="k">26Q3 단가</span><span class="v num">${cu!=null?f(cu)+'원':'아직 없음'}</span><span class="d">${it.u?esc(it.u)+'당':'단위 없음'}</span></div></div>`;}
 function stepPriceDrill(){const it=pItem();const c=pchg(it,st.cmp);const C=CC();
  const ms=V5.MONTHS.filter(Boolean);const up={};ms.forEach(y=>{const v=it.m[y];if(v&&v[1]>0)up[y]=v[0]/v[1]});
  const mxY=Object.keys(up).sort((a,b)=>up[b]-up[a])[0];
  const mrows=ms.map((y,k)=>{const v=it.m[y];const pv=k&&y!=='2601'?up[ms[k-1]]:null;const u=up[y];return `<tr><td class="num l">${ym2(y)}</td><td class="num">${v?f(v[1]):'-'}</td><td class="num strong">${u!=null?f(u):'-'}</td><td class="num">${v?V5.vYm(v[0],y):'-'}</td><td class="num">${u!=null&&pv>0?pctS((u/pv-1)*100):'-'}</td></tr>`}).join('');
  const pm=acc('pmonth','월별 단가·수량',`12개월 · 가장 비싼 달 ${mxY?ym2(mxY)+' '+f(up[mxY])+'원':'-'}`,V5.chart('월별 단가','원 / '+(it.u||'단위 없음')+' · 공급가액 ÷ 수량',up)+`<table class="tbl sm" id="pmTbl"><thead><tr><th>월</th><th class="num">수량</th><th class="num">단가(원)</th><th class="num">${amtMode()?'금액(원)':'비율 · '+V5.basisLabel()}</th><th class="num">전월 대비</th></tr></thead><tbody>${mrows}</tbody></table>`);
  const vs=Object.entries(it.v).map(([vc,m])=>{const x=pchg({m},st.cmp);return {vc,n:M2.vn[vc]||vc,...x}}).filter(x=>x.ca>0||x.pa>0).sort((a,b)=>b.ca-a.ca);
- const pv=acc('pvend','업체별 단가',`${vs.length}곳`,`<table class="tbl sm" id="pvTbl"><thead><tr><th>업체</th><th class="num">${C.pl} 단가</th><th class="num">${C.cl} 단가</th><th class="num">등락</th><th class="num">${C.cl} ${amtMode()?'금액':'비율'}</th></tr></thead><tbody>${vs.length?'':`<tr><td colspan="5" class="sub" id="pvNone">${C.pl}·${C.cl}에 이 자재를 산 업체가 없어요</td></tr>`}${vs.map(x=>`<tr${x.isNew?` class="ndrow" title="${C.pl} 구매 줄 없음 · 등락 계산에서 빼요"`:''}><td>${esc(x.n)}</td><td class="num">${x.pu!=null?f(x.pu):x.isNew?ND:'-'}</td><td class="num strong">${x.cu!=null?f(x.cu):'-'}</td><td class="num">${x.chg!=null?pctS(x.chg):(x.isNew?ND:'비교불가')}</td><td class="num">${x.ca?amtOrPct(x.ca,C.cur):'-'}</td></tr>`).join('')}</tbody></table>`);
+ const pv=acc('pvend','업체별 단가',`${vs.length}곳`,`<table class="tbl sm" id="pvTbl"><thead><tr><th>업체</th><th class="num">${C.pl} 단가</th><th class="num">${C.cl} 단가</th><th class="num">등락</th><th class="num">${C.cl} ${amtMode()?'금액':'비율'}</th></tr></thead><tbody>${vs.length?'':`<tr><td colspan="5" class="sub" id="pvNone">${C.pl}·${C.cl}에 이 자재를 산 업체가 없어요</td></tr>`}${vs.map(x=>`<tr${x.isNew?` class="ndrow" title="${C.pl} 구매 아직 없음 · 등락 계산에서 빼요"`:''}><td>${esc(x.n)}</td><td class="num">${x.pu!=null?f(x.pu):x.isNew?ND:'-'}</td><td class="num strong">${x.cu!=null?f(x.cu):'-'}</td><td class="num">${x.chg!=null?pctS(x.chg):(x.isNew?ND:'비교불가')}</td><td class="num">${x.ca?amtOrPct(x.ca,C.cur):'-'}</td></tr>`).join('')}</tbody></table>`);
  const H=heat(SCOPE.raw.g.includes(it.g)?'raw':'pack',st.cmp);const sec=H.secs.find(x=>x.s===it.sec);
  const ps=acc('psame','같은 분류 다른 자재',sec?`${esc(sec.s)} ${sec.items.length}개 · 평균 ${pctS(sec.avg)}`:'-',sec?sec.items.slice(0,12).map(i=>`<button class="tm-row" data-tm2="${i.c}"><span class="rn">${esc(i.n)} <span class="sub">${amtOrPct(i.ca,C.cur)}</span></span><span class="pp" style="background:${BKC[bucket(i.chg)]};color:${['z','n'].includes(bucket(i.chg))?'#303030':'#fff'}">${chgLbl(i)}</span></button>`).join(''):'<div class="empty">같은 분류 다른 자재가 없어요</div>');
  return `${guide(`필요한 표만 펼쳐 봐요. 오른쪽 AI 창에서 바로 절감 계획을 만들 수 있어요.`,prevBtn()+nextBtn('계획 확인'))}
@@ -266,7 +266,7 @@ function wfData(i){// 금액: 월평균 / 비율: %p · r6: 비교 기간 선택
  // 비교 기간 비교 기간 없는 업체·채널: 증감이 아니라 이번 기간 값만 있어 한 칸(입력 필요)으로 모아 끝을 맞춘다
  const nod=i.drivers.filter(d=>d.x.nd&&(d.x.ca||0)!==0);const nv=nod.reduce((a,d)=>a+(amt?d.x.ac:(d.x.rc||0)),0);
  if(nod.length&&Math.abs(nv)>(amt?1:0.0005))cols.push({id:'__nod',n:`${CC().pl} 비교 기간 없음 ${nod.length}곳`,v:nv,resid:true,nd:true,tip:`${nod.map(d=>d.name).join(', ')} · ${CC().pl}에 줄이 없어 증감으로 세지 않아요 · ${CC().cl} ${amt?'월평균 '+f(nv)+'원':nv.toFixed(2)+'%'} (${ND})`});
- const resid=(end-start)-ds.reduce((a,d)=>a+d.v,0)-(cols.some(c=>c.nd)?nv:0);if(Math.abs(resid)>(amt?1:0.0005))cols.push({id:'__resid',n:i.drivers.length?'원장 외 차이':`${i.dl} 비교 기간 없음`,v:resid,resid:true});
+ const resid=(end-start)-ds.reduce((a,d)=>a+d.v,0)-(cols.some(c=>c.nd)?nv:0);if(Math.abs(resid)>(amt?1:0.005))cols.push({id:'__resid',n:i.drivers.length?'원장 외 차이':`${i.dl} 비교 기간 없음`,v:resid,resid:true});
  return {amt,start,end,cols,rest};}
 function waterfall(i){const W=wfData(i);if(!W)return `<div class="empty">${(i.x||cmpM(i.m)).nd?`${CC().pl} 비교 기간이 없어 증감을 그릴 수 없어요(${ND})`:V5.NOS}</div>`;
  let run=W.start;const pts=[W.start,W.end];W.cols.forEach(c=>{run+=c.v;pts.push(run)});const mn=Math.min(...pts),mx=Math.max(...pts);const lo=Math.max(0,mn-(mx-mn)*0.6),hi=mx+(mx-mn)*0.1||1;const Hh=160;const y=v=>Math.round((v-lo)/(hi-lo)*Hh);
@@ -276,9 +276,10 @@ function waterfall(i){const W=wfData(i);if(!W)return `<div class="empty">${(i.x|
  W.cols.forEach(c=>{const a=run,b=run+c.v;run=b;const up=c.v>=0;h+=col((up?'up':'dn')+(c.resid?' resid':'')+(c.nd?' nod':''),y(Math.min(a,b)),Math.abs(y(b)-y(a)),c.nd?ND:dl(c.v),c.n,c.resid?(c.nd?'disabled data-nod="1"':'disabled'):`data-wf="${esc(c.id)}"`,c.tip||`${c.n} ${dl(c.v)}${c.resid?'':c.rest?' · 누르면 펼쳐져요':' · 누르면 3단계 상세'}`)});// r7 P3: 누를 수 없는 차이 막대(원장 외 차이·○○ 자료 없음)는 '누르면 3단계 상세'라고 하지 않아요
  h+=col('tot end',0,y(W.end),lab(W.end),C.cl,'disabled',`${C.cl} ${W.amt?'월평균 '+f(W.end)+'원':W.end.toFixed(2)+'%'}`);
  const restList=W.rest.length&&st.open.has('rest')?`<div class="wf-rest" id="wfRest">${W.rest.map(d=>`<button class="tm-row" data-wf="${esc(d.id)}" title="${esc(d.n)}"><span class="rn">${esc(d.n)}</span><span class="num">${dl(d.v)}</span></button>`).join('')}</div>`:'';
- return `<div class="wf" id="waterfall">${h}</div>${lo>0?'<div class="wf-ax">세로축은 0부터가 아니에요</div>':''}${restList}${wfCheck(W)}`;}
+ return `<div class="wf" id="waterfall">${h}</div>${restList}${wfCheck(W)}`;}
 // r13 c7: 막대 합계 검산 한 줄(운반비처럼 '자료 없음' 칸이 끼면 막대 숫자를 더해도 끝 값과 달라 보였어요)
-function wfCheck(W){const S=v=>W.amt?f(Math.abs(v))+'원':Math.abs(v).toFixed(2)+(W.amt?'':'%p'),T=v=>W.amt?f(v)+'원':v.toFixed(2)+'%';const sg2=v=>(v<0?'−':'+')+S(v);
+function wfCheck(W){return '';}
+function wfCheckOld(W){const S=v=>W.amt?f(Math.abs(v))+'원':Math.abs(v).toFixed(2)+(W.amt?'':'%p'),T=v=>W.amt?f(v)+'원':v.toFixed(2)+'%';const sg2=v=>(v<0?'−':'+')+S(v);
  const mv=W.cols.filter(c=>!c.nd&&!c.resid),nd=W.cols.find(c=>c.nd),rs=W.cols.find(c=>c.resid&&!c.nd);
  const sum=mv.reduce((a,c)=>a+c.v,0);
  return `<div class="wf-chk num" id="wfChk">검산 · ${CC().pl} ${T(W.start)} ${sg2(sum)}(막대 ${mv.length}개 합)${nd?` + ${nd.n.replace(CC().pl+' ','')}의 ${CC().cl} 몫 ${T(nd.v)}`:''}${rs?` ${sg2(rs.v)}(${rs.n})`:''} = ${CC().cl} ${T(W.end)}${nd?' · 비교 기간 없는 칸은 비교 기간 값이 없어 증감 대신 이번 기간 값을 그대로 더해요':''} · 소수 반올림으로 ±0.1 어긋날 수 있어요</div>`;}
@@ -286,8 +287,8 @@ function microChips(i){const mv=i.m;const mx=Object.keys(mv).sort((a,b)=>mv[b]-m
  ch.push(['▲',`최대 ${ym2(mx)}`,`가장 큰 달 ${ym2(mx)} ${f(mv[mx])}원`]);
  const op=st.cmp==='q3'?'26H1':'25Q3';if(hasY(i.m,PMON3[op])){const dOp=i.c['26Q3']/3-i.c[op]/PMN[op];ch.push(['↔',`${op} ${manK(dOp)}`,`${PL[op]} 월평균 ${f(i.c[op]/PMN[op])}원 대비 ${sg(dOp)}원(다른 비교 기준)`]);}
  else ch.push(['↔',`${op} ${ND}`,`${PL[op]} 비교 기간 없음 · 다른 비교 기준으로는 증감을 계산하지 않아요`]);
- const b=V5.salesP('26Q3',isP()?'prod':'online');if(b)ch.push(['%',`${st.div==='online'?OBL:'매출'} 대비 ${(i.c['26Q3']/b*100).toFixed(1)}%`,`${isP()?'생산매출':OBL} 대비 2026 Q3`]);
- if(isP()&&i.drivers.length){const lg=i.drivers.reduce((a,d)=>a+d.c['26Q3'],0);const df=Math.round(lg-i.c['26Q3']);if(df)ch.push(['!',`원장≠마감 ${manK(df)}`,`2026 Q3 원장 ${f(lg)}원 / 마감 ${f(i.c['26Q3'])}원 · 확인 필요`]);
+ const b=V5.salesP('26Q3',isP()?'prod':'online');if(b)ch.push(['%',`${st.div==='online'?OBL:'매출'} 대비 ${(i.c['26Q3']/b*100).toFixed(1)}%`,`${isP()?'생산매출':OBL} 대비 26Q3`]);
+ if(isP()&&i.drivers.length){const lg=i.drivers.reduce((a,d)=>a+d.c['26Q3'],0);const df=Math.round(lg-i.c['26Q3']);if(df)ch.push(['!',`원장≠마감 ${manK(df)}`,`26Q3 원장 ${f(lg)}원 / 마감 ${f(i.c['26Q3'])}원 · 확인 필요`]);
   const rs=(PD.mat[i.code]||[]).filter(m=>{const r=priceRise(m);return (!i.vd||m.vendor===i.vd)&&r&&r.to>r.from});/* U4: 업체 상세 2단계면 그 업체 자재만 */if(rs.length)ch.push(['₩',`단가↑ ${rs.length}개`,rs.slice(0,5).map(m=>{const r=priceRise(m);return `${m.name} ${f(r.from)}→${f(r.to)}`}).join(', ')]);}
  if(st.div==='online'){const mc=view().filter(l=>l.item===i.title&&l.moved).length;if(mc)ch.push(['⇄',`이동 ${mc}줄`,'채널 이동 반영']);}
  return `<div class="mchips" id="mchips">${ch.map(([ic,t,tip])=>`<span class="mchip" title="${esc(tip)}"><b>${ic}</b>${esc(t)}</span>`).join('')}</div>`;}
@@ -312,21 +313,25 @@ function stepVendDrill(){const {a,v}=vdData();const c=tots(v.m);const C=CC();con
  <div class="s2head"><div><div class="pg-eyebrow">${divName()} · ${esc(a.name)} ${a.code} · 업체</div><div class="pg-h" id="vdTitle">${esc(v.name)}</div><div class="s2key num" id="vdKey" title="${C.cl} 월평균 ${f(x.ac)}원 · ${x.nd?`${C.pl} 비교 기간 없음 · 증감 계산 안 해요`:`${C.pl} 월평균 ${f(x.ap)}원 · 금액 ${pctS(chg)}`}">${x.nd?ND:amtMode()?pctS(chg):ppS(x.pp)} <span class="sub">${x.nd?`${C.pl} 비교 기간 없음 · `:''}${C.s}</span></div></div>${spark(v.m,'vdSpark')}</div>
  ${st.div==='prod'?sigBlock([vendSig(a.code,{id:v.code,name:v.name})],'업체 단가 → 영향'):''}
  <div class="accs">${acc('vmonth','월별 금액',`12개월 · ${C.cl} ${amtOrPct(ca,C.cur)}`,V5.chartM('월별 금액',`${v.name} · 이카운트 원장`,v.m)+`<table class="tbl sm" id="vdTbl"><thead><tr><th>월</th><th class="num">${amtMode()?'금액(원)':'비율'}</th></tr></thead><tbody>${mrows}</tbody></table>`)}
- ${st.div==='prod'?acc('vmat','연관된 자재',mats.length?`${mats.length}개`:'구매현황 연결 자재 줄 없음',mats.length?mats.map(m=>{const r=priceRise(m);return `<div class="rrow" title="${r?`단가 ${f(r.from)}→${f(r.to)}원(${ym2(r.ym)}부터)`:'단가 그대로'}"><span><b>${esc(m.name)}</b> <span class="rs">${esc(m.spec)}</span></span><span class="num">${vPb(V5.periodAmt(m,'26Q3'),'26Q3')}</span></div>`}).join(''):'<div class="empty">이 업체와 연결된 자재가 없어요</div>'):''}</div>`;}
+ ${st.div==='prod'?acc('vmat','연관된 자재',mats.length?`${mats.length}개`:'구매현황 연결 자재 아직 없음',mats.length?mats.map(m=>{const r=priceRise(m);return `<div class="rrow" title="${r?`단가 ${f(r.from)}→${f(r.to)}원(${ym2(r.ym)}부터)`:'단가 그대로'}"><span><b>${esc(m.name)}</b> <span class="rs">${esc(m.spec)}</span></span><span class="num">${vPb(V5.periodAmt(m,'26Q3'),'26Q3')}</span></div>`}).join(''):'<div class="empty">이 업체와 연결된 자재가 없어요</div>'):''}</div>`;}
 // ---------- 4단계(r5): 계획 확인 ----------
 // r7 P1(R6ND-17): 목표는 한 줄(V5.planTgt). 예전 '목표 문구 + 목표 금액' 두 줄 겹침 정리, 예전 문구는 title 에만
 // U6: 계획 카드 = 최근 수정 순(V5.plansSorted, 사이드바와 같은 순서) · 카드마다 data-pid(수정·삭제 버튼은 plan_edit.js 가 이 id 로 붙임) · 작성/수정 줄 V5.planMeta
 function step4(){const plans=V5.ST.plans;
- return `${guide(`절감계획을 표에 직접 적고 확인해요. AI 대화는 오른쪽 창에서 어느 화면에서나 이어져요(꼭 쓰지 않아도 돼요).`,prevBtn()+`<button class="btn sec sm" id="restart">처음으로</button>`)}
+ return `${guide(`아래 표에서 계획을 적고, 고치고, 지워요. 오른쪽 칸은 빠른 입력이에요.`,prevBtn()+`<button class="btn sec sm" id="restart">처음으로</button>`)}
  <div><div class="pg-eyebrow">${divName()}</div><div class="pg-h">절감 계획 <span class="pg-n num" id="planN">${plans.length}건</span></div></div>
- <div class="plist" id="planList">${plans.length?V5.plansSorted().map(p=>`<section class="card pcard" data-pid="${esc(String(p.id))}" title="근거: ${esc(p.basis||'')}"><div class="pt">${esc(p.vendor)} <span class="b b-g">${esc(p.status||'초안')}</span></div><div class="pk2">${esc(p.account)} · ${esc(p.method)}</div>${(T=>`<div class="pv num ptgt"${T.o?` title="예전 목표 문구: ${esc(T.o)}"`:''}>${T.t===V5.targetText(null)?'':`<span class="sub">${T.amt?'목표 금액':'목표'}</span> `}${esc(T.t)}</div>`)(V5.planTgt(p))}<div class="sub">기한 ${esc(p.due)}${p.example?' · 예시 AI 초안':''}</div>${V5.planMeta(p)}</section>`).join(''):emptyBox('planEmpty','아직 저장한 절감 계획이 없어요',`위 표의 ‘+ 계획 추가’ 줄에 직접 적고 ‘추가’를 누르면 저장돼서 여기에 모여요. AI 도움이 필요하면 줄의 ‘AI 초안 채우기’를 쓰거나 오른쪽 AI 창에서 ‘${V5.PLAN_LABEL}’를 눌러도 돼요.`)}</div>`;}
+ <div class="plist" id="planList" hidden></div>`;}
 // ---------- 3단계 ----------
 function curCh(){if(st.div!=='online'||st.a==='vd')return null;/* U4: 업체 상세에는 채널이 없어요(예전엔 자사몰 채널 매출이 기준 선택지로 보였어요) */if(st.ch)return st.ch;const i=cur();const d=i&&i.drivers.filter(x=>x.d>0)[0]||i&&i.drivers[0];return d?d.id:'D2C';}
 function monthTable(vals,label){return `<table class="tbl sm" id="monthTbl"><thead><tr><th>월</th><th class="num">${amtMode()?'금액(원)':'비율 · '+V5.basisLabel()+' 대비'}</th></tr></thead><tbody>${V5.MONTHS.map(y=>y?`<tr><td class="num l">${ym2(y)}</td><td class="num">${vals[y]!=null?V5.vYm(vals[y],y):'-'}</td></tr>`:`<tr><td colspan="2" class="sub">25.10~12 비교 기간 없음</td></tr>`).join('')}</tbody></table>`;}
+function impactSentence(i){const x=cmpM(i.m),C=CC();const sp=x.sp&&x.sc?(x.sc/C.cur.length)/(x.sp/C.prev.length)-1:null;
+ if(x.nd||x.r==null)return `${i.title}: ${CC().pl} 비교 자료가 없어 비율 변화를 말할 수 없어요`;
+ const pc=v=>(v>=0?'+':'')+(v*100).toFixed(0)+'%';
+ return sp==null?`${i.title} ${pc(x.r/100)}(월평균)`:`매출 ${pc(sp)} 대비 ${i.title} ${pc(x.r/100)}라 비율 ${x.pp==null?'-':ppS(x.pp)}`;}
 function step3(){const i=cur();if(!i)return step1();
  const nx=guide(`필요한 표만 펼쳐 봐요. 오른쪽 AI 창에서 바로 절감 계획을 만들 수 있어요.`,`<button class="btn sec sm" id="prevList" data-step="1">‹ 이전</button>`+nextBtn('계획 확인'));
  const head=`<div><button class="linkbtn" id="backList" style="font-size:14px;color:#616161">‹ 이슈 목록</button></div><div><div class="pg-eyebrow">${divName()} · ${esc(i.title)} ${i.code}</div><div class="pg-h">${josa(i.title,'을','를')} 자세히 봐요</div><div class="pg-s">표는 접혀 있어요. 제목을 누르면 펼쳐져요.</div>${st.div==='online'&&!amtMode()&&curCh()?'<div class="pg-s" id="basisHint">‘채널 매출’ 기준은 월별 흐름·월별 줄 표에만 써요.</div>':''}</div>`;// r7 P1(R6ND-6): 기준 선택지는 그대로, 짧은 안내 1줄
- if(isP())return nx+head+sigBlock(sigs3(i),'원인 → 영향')+`<div class="accs">${prodAccs(i)}</div>`;
+ if(isP())return nx+head+sigBlock(sigs3(i),impactSentence(i))+`<div class="accs">${prodAccs(i)}</div>`;
  return nx+head+sigBlock(sigs3(i),'채널 → 비율(온라인 매출 대비)')+`<div class="accs">${onlineAccs(i)}</div>`;}
 // ---------- r6: 토스 시그널(원인 카드 → 영향 대상 2개 + n개 더보기) ----------
 let SIG={};
@@ -347,7 +352,7 @@ function matSig(it){const C=CC();const x=pchg(it,st.cmp);if(x.chg==null)return n
  const vs=Object.entries(it.v).map(([vc,m])=>({vc,n:M2.vn[vc]||vc,...pchg({m},st.cmp)})).filter(y=>y.chg!=null).sort((a,b)=>b.cq*(b.cu-b.pu)-a.cq*(a.cu-a.pu));
  const vT=vs.map(y=>({n:y.n,v:pctS(y.chg),tip:`업체 단가 ${f(y.pu)}→${f(y.cu)}원`,act:()=>{st.pendOpen=['pvend'];go({s:3,a:'price',pm:it.c,hm:null})}}));
  return {id:'m-'+it.c,kind:'자재 단가',title:it.n,reason:`${f(x.pu)}→${f(x.cu)}원${it.u?' / '+it.u:''}`,val:pctS(x.chg),tip:`${C.pl}→${C.cl} 가중 단가(공급가액÷수량)`,go:()=>openPrice(it.c),
-  targets:accT.concat(vT).concat([{n:'제품',v:'BOM 줄 없음',tip:'DB에 제품별 자재 사용량(BOM)이 없어요'}])};}
+  targets:accT.concat(vT).concat([{n:'제품',v:'BOM 아직 없음',tip:'DB에 제품별 자재 사용량(BOM)이 없어요'}])};}
 function salesSig(i){const C=CC();const sc=salesSum(C.cur),sp=salesSum(C.prev);if(!sc||!sp||i.pp==null)return null;const sr=(sc/C.cur.length)/(sp/C.prev.length)*100-100;
  const accs=PD.acc.filter(a=>!LABOR[a.code]).map(a=>({a,x:cmpM(a.m)})).filter(y=>y.x.pp!=null&&(y.x.ca||y.x.pa));
  const me=accs.find(y=>y.a.code===i.code);const others=accs.filter(y=>y!==me).sort((p,q)=>Math.abs(q.x.pp)-Math.abs(p.x.pp));
@@ -378,13 +383,13 @@ function prodAccs(i){const mv=i.m;const mx=Object.keys(mv).sort((a,b)=>mv[b]-mv[
  const vs=i.drivers.slice().sort((a,b)=>b.c['26Q3']-a.c['26Q3']);const vt=vs.reduce((a,v)=>a+v.c['26Q3'],0);
  const selV=vs.find(v=>v.id===st.v);
  const month=acc('month','월별 흐름',`12개월 · 가장 큰 달 ${ym2(mx)}`,V5.chartM('월별 흐름',`${i.title} · Z-IPS 마감값`,mv)+monthTable(mv));
- const vend=acc('vend','업체별 금액',vs.length?`${vs.length}곳 · 2026 Q3 1위 ${esc(vs[0].id==='BLANK'?'거래처 미기재':vs[0].name)} ${vt?(vs[0].c['26Q3']/vt*100).toFixed(1):0}%`:'원장 업체 비교 기간 없음',
+ const vend=acc('vend','업체별 금액',vs.length?`${vs.length}곳 · 26Q3 1위 ${esc(vs[0].id==='BLANK'?'거래처 미기재':vs[0].name)} ${vt?(vs[0].c['26Q3']/vt*100).toFixed(1):0}%`:'원장 업체 비교 기간 없음',
   vs.length?`<table class="tbl sm" id="vendTbl"><thead><tr><th>업체</th>${P.map(p=>`<th class="num">${PL[p]}</th>`).join('')}<th class="num">vs ${CC().pl}</th><th class="num">구성비</th></tr></thead><tbody>${vs.slice(0,12).map(v=>`<tr class="click${st.v===v.id?' selrow':''}" data-v="${v.id}" tabindex="0"><td>${esc(v.id==='BLANK'?'거래처 미기재':v.name)}${vNatOf(v.id)?` <span class="b b-g">${vNatOf(v.id)}</span>`:''}</td>${P.map(p=>`<td class="num${p==='26Q3'?' strong':''}">${hasY(v.m,PMON3[p])?vPb(v.c[p],p):p==='26Q3'?'-':ND}</td>`).join('')}<td class="num">${dPb(v.m)}</td><td class="num">${vt?(v.c['26Q3']/vt*100).toFixed(1)+'%':'-'}</td></tr>`).join('')}</tbody></table><div class="sub" style="margin-top:8px">${amtMode()?'월평균 원':'비율 · '+V5.basisLabel()+' 대비'} · 업체를 누르면 ‘자재 단가·수량’이 그 업체로 좁혀져요${vs.length>12?` · 외 ${vs.length-12}곳`:''}${[vSrcNote(i.code),q4VendNote()].filter(Boolean).map(x=>'<br>'+esc(x)).join('')}</div>`:'<div class="empty">이 계정은 이카운트 원장에 업체 줄이 없어요.</div>');
  let ms=(PD.mat[i.code]||[]);if(selV)ms=ms.filter(m=>m.vendor===selV.id);ms=ms.slice().sort((a,b)=>V5.periodAmt(b,'26Q3')-V5.periodAmt(a,'26Q3'));
  const rs=ms.filter(m=>{const r=priceRise(m);return r&&r.to>r.from});
  let selM=ms.find(m=>m.key===st.m)||rs[0]||ms[0];
  const VN=Object.fromEntries(i.drivers.map(v=>[v.id,v.name]));
- const mat=acc('mat','자재 단가·수량',ms.length?`${ms.length}개 자재${selV?' · '+esc(selV.name):''} · 단가 오른 자재 ${rs.length}개`:'구매현황 연결 자재 줄 없음',
+ const mat=acc('mat','자재 단가·수량',ms.length?`${ms.length}개 자재${selV?' · '+esc(selV.name):''} · 단가 오른 자재 ${rs.length}개`:'구매현황 연결 자재 아직 없음',
   ms.length?`<input class="search" id="matQ" placeholder="자재 이름으로 찾기" aria-label="자재 이름으로 찾기" aria-controls="matList"><div class="empty" id="matNone" hidden role="status">찾는 자재가 없어요. 다른 이름으로 찾아보세요.</div><div class="mlist" id="matList">${ms.map(m=>`<div class="mi${selM&&m.key===selM.key?' on':''}" data-m="${esc(m.key)}" role="button" tabindex="0" aria-pressed="${!!(selM&&m.key===selM.key)}"><span>${esc(m.name)} <span class="sub">${esc(VN[m.vendor]||'')}</span></span><span class="num">${vPb(V5.periodAmt(m,'26Q3'),'26Q3')}</span></div>`).join('')}</div>
   ${selM?`<div class="ct" style="margin-top:16px" id="matTitle">${esc(selM.name)} <span class="ctsub">${esc(VN[selM.vendor]||'')} · 월별 수량 · 단가 · ${amtMode()?'금액':'비율'}</span></div><table class="tbl sm" id="matTbl"><thead><tr><th>월</th><th class="num">수량</th><th class="num">단가(원)</th><th class="num">${amtMode()?'금액(원)':'비율'}</th></tr></thead><tbody>${V5.MONTHS.filter(Boolean).map(y=>{const v=selM.m[y];return `<tr><td class="num l">${ym2(y)}</td><td class="num">${v?f(v[1]):'-'}</td><td class="num">${v&&v[1]?f(v[0]/v[1]):'-'}</td><td class="num">${v?V5.vYm(v[0],y):'-'}</td></tr>`}).join('')}</tbody></table>`:''}`:'<div class="empty">이 계정은 구매현황에 연결된 자재 줄이 없어요.</div>');
  return month+vend+(st.div==='mgmt'?'':mat);}// 경영지원은 구매현황 자재가 없어 ‘자재 단가·수량’을 숨겨요
@@ -395,12 +400,12 @@ function onlineAccs(i){const V=view();const ch=curCh();
  // U2: 3단계 기준을 '채널 매출'로 바꾸면 월별 그래프·표·줄 표만 그 채널 매출 대비가 돼요(시그널·채널별 금액 표는 온라인 매출 고정) → 섞여 보이지 않게 알림
  const bnote=!amtMode()&&V5.basis()==='channel'?`<div class="sub basisnote" style="margin-top:8px">이 그래프·표는 ${CHN[ch]} 채널 매출 대비예요. 시그널·채널별 금액 표·워터폴은 ${OBL} 기준이에요.</div>`:'';
  const month=acc('month','월별 흐름',`${CHN[ch]} · ${esc(i.title)} · 가장 큰 달 ${mx?ym2(mx):'-'}`,chips+'<div style="height:12px"></div>'+V5.chartM('월별 흐름',`${CHN[ch]} · ${i.title}`,mvals)+monthTable(mvals)+bnote);
- const chan=acc('chan','채널별 금액',`${chs.length}개 채널 · 2026 Q3 1위 ${esc(chs[0]?chs[0].name:'-')}`,`<table class="tbl sm" id="chanTbl"><thead><tr><th>채널</th>${P.map(p=>`<th class="num">${PL[p]}</th>`).join('')}<th class="num">vs ${CC().pl}</th></tr></thead><tbody>${chs.length?'':`<tr><td colspan="5" class="sub" id="chanNone">이 항목은 채널 줄 없음(채널별 비용 줄이 없어요)</td></tr>`}${chs.map(d=>`<tr class="click${d.id===ch?' selrow':''}" data-ch="${d.id}" tabindex="0"><td>${esc(d.name)}${V.some(l=>l.moved&&l.item===i.title&&(l.eff===d.id||l.ch===d.id))?' <span class="b moved">이동 반영</span>':''}</td>${P.map(p=>`<td class="num${p==='26Q3'?' strong':''}">${hasY(d.m,PMON3[p])?vPb(d.c[p],p,'online'):p==='26Q3'?'-':ND}</td>`).join('')}<td class="num">${dPb(d.m,'online')}</td></tr>`).join('')}</tbody></table><div class="sub" style="margin-top:8px">${amtMode()?'월평균 원':'비율 · 온라인 매출 대비(채널끼리 비교하려고 고정)'} · 채널을 누르면 아래 표가 그 채널로 바뀌어요</div>`);
+ const chan=acc('chan','채널별 금액',`${chs.length}개 채널 · 26Q3 1위 ${esc(chs[0]?chs[0].name:'-')}`,`<table class="tbl sm" id="chanTbl"><thead><tr><th>채널</th>${P.map(p=>`<th class="num">${PL[p]}</th>`).join('')}<th class="num">vs ${CC().pl}</th></tr></thead><tbody>${chs.length?'':`<tr><td colspan="5" class="sub" id="chanNone">이 항목은 채널 아직 없음(채널별 비용 줄이 없어요)</td></tr>`}${chs.map(d=>`<tr class="click${d.id===ch?' selrow':''}" data-ch="${d.id}" tabindex="0"><td>${esc(d.name)}${V.some(l=>l.moved&&l.item===i.title&&(l.eff===d.id||l.ch===d.id))?' <span class="b moved">이동 반영</span>':''}</td>${P.map(p=>`<td class="num${p==='26Q3'?' strong':''}">${hasY(d.m,PMON3[p])?vPb(d.c[p],p,'online'):p==='26Q3'?'-':ND}</td>`).join('')}<td class="num">${dPb(d.m,'online')}</td></tr>`).join('')}</tbody></table><div class="sub" style="margin-top:8px">${amtMode()?'월평균 원':'비율 · 온라인 매출 대비(채널끼리 비교하려고 고정)'} · 채널을 누르면 아래 표가 그 채널로 바뀌어요</div>`);
  const L=V.filter(l=>l.eff===ch&&l.item===i.title).sort((a,b)=>a.ym.localeCompare(b.ym));const moves=loadMoves();
  const lines=acc('lines','월별 줄 · 채널 이동',`${CHN[ch]} · ${L.length}줄${st.sel.size?' · '+st.sel.size+'줄 선택':''}`,
   `${chips}<div class="lines-h" style="margin-top:12px"><span class="sub" id="selInfo">${st.sel.size?st.sel.size+'줄 선택':'옮길 줄을 골라요'}</span><button class="btn pri sm" id="moveBtn" ${st.sel.size?'':'disabled'}>채널 이동</button></div>
   <table class="tbl sm" id="lineTbl"><thead><tr><th></th><th>월</th><th>항목</th><th class="num">${amtMode()?'금액(원)':'비율'}</th><th>상태</th><th></th></tr></thead><tbody>${L.map(l=>{const m=moves.filter(x=>x.key===l.key&&x.status==='이동됨').slice(-1)[0];return `<tr><td><input type="checkbox" class="lc" data-key="${l.key}" aria-label="${ym2(l.ym)} ${esc(l.item)} 줄 고르기" ${st.sel.has(l.key)?'checked':''}></td><td class="num l">${ym2(l.ym)}</td><td>${esc(l.item)} <span class="code">${l.acct||''}</span></td><td class="num strong">${V5.vYm(l.amt,l.ym)}</td><td>${l.moved?`<span class="b moved">이동됨 · 원래 ${CHN[l.ch]}</span>`:'<span class="sub">원래 채널</span>'}</td><td>${m?`<button class="linkbtn" data-undo="${m.id}">되돌리기</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="6" class="sub">이 채널에 이 항목 줄이 없어요</td></tr>'}</tbody></table>${bnote}<div class="note">이동은 앱 상태 DB에 이력으로 저장돼요. 원본 비용 DB는 바꾸지 않아요.</div>`);
- const hs=moves;const hist=acc('hist','채널 이동 이력',hs.length?`${hs.length}건 · 마지막 ${V5.dt(hs[hs.length-1].at)}`:'줄 없음',hs.length?`<table class="tbl sm hist" id="histTbl"><thead><tr><th>시각</th><th>누가</th><th>줄</th><th>원래 → 이동</th><th>상태</th></tr></thead><tbody>${hs.slice().reverse().map(m=>`<tr><td class="nw num">${V5.dt(m.at)}</td><td class="nw">${esc(m.by||'-')}</td><td class="nw">${ym2(m.ym)} ${esc(m.item)}</td><td>${CHN[m.orig]} → ${CHN[m.to]}</td><td>${m.status}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">아직 이동한 줄이 없어요.</div>');
+ const hs=moves;const hist=acc('hist','채널 이동 이력',hs.length?`${hs.length}건 · 마지막 ${V5.dt(hs[hs.length-1].at)}`:'아직 없음',hs.length?`<table class="tbl sm hist" id="histTbl"><thead><tr><th>시각</th><th>누가</th><th>줄</th><th>원래 → 이동</th><th>상태</th></tr></thead><tbody>${hs.slice().reverse().map(m=>`<tr><td class="nw num">${V5.dt(m.at)}</td><td class="nw">${esc(m.by||'-')}</td><td class="nw">${ym2(m.ym)} ${esc(m.item)}</td><td>${CHN[m.orig]} → ${CHN[m.to]}</td><td>${m.status}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">아직 이동한 줄이 없어요.</div>');
  return month+chan+lines+hist;}
 // ---------- AI 맥락 ----------
 // U3: 모든 AI 진입점(빠른 질문·자유 입력·절감 계획 초안·히트맵·업체 상세·자재 단가)이 보기(mode)와 분모(sales·basisLabel)를 같이 보내요.

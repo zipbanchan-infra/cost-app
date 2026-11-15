@@ -7,7 +7,7 @@ const DIVID={prod:'PROD',online:'ONLINE',mgmt:'MGMT'};
 const DUE='2026-12-31';
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=n=>Math.round(n).toLocaleString('ko-KR');
-const D0={method:'',target:'',plan:'',reason:'',account:'',vendor:'',due:''};
+const D0={method:'',target:'',plan:'',reason:'',account:'',vendor:'',due:'',owner:'',open:false};
 const load=()=>{try{return Object.assign({},D0,JSON.parse(localStorage.getItem(KEY))||{});}catch(e){return Object.assign({},D0);}};
 let D=load();let busy=false;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){}};
@@ -15,17 +15,17 @@ const $=id=>document.getElementById(id);
 const g=name=>{try{return (0,eval)(name);}catch(e){return undefined;}};
 
 // ---------- 지금 보는 곳(계정·거래처·품목)과 현재 단가·현재 비율 ----------
-function ctx(){const o={account:'',code:'',vendor:'',item:'',itemCode:'',cu:null,unit:'',ratio:null,where:''};
+function ctx(){const o={account:'',code:'',vendor:'',item:'',itemCode:'',cu:null,q:null,unit:'',ratio:null,where:''};
  const st=g('st');if(!st)return o;o.div=st.div;
  try{const R=window.R10CHART;const H=R&&R.HM;
-  if(st.s===3&&st.a==='price'&&st.div==='prod'){const it=g('pItem')();if(it){const u=g('pchg')(it,st.cmp);o.item=it.n;o.itemCode=it.c;o.cu=u.cu;o.unit=it.u||'';o.account='원재료 단가';o.where=it.n;}}
+  if(st.s===3&&st.a==='price'&&st.div==='prod'){const it=g('pItem')();if(it){const u=g('pchg')(it,st.cmp);o.item=it.n;o.itemCode=it.c;o.cu=u.cu;o.q=g('sumM')(it.m,g('CC')().cur)[1]/g('CC')().cur.length;o.unit=it.u||'';o.account='원재료 단가';o.where=it.n;}}
   else if(st.a==='vd'&&st.s>=2){const {a,v}=g('vdData')();o.account=`${a.name}(${a.code})`;o.code=a.code;o.vendor=v.name;o.where=`${a.name} · ${v.name}`;let m=v.m;
     const live=H&&H.sel&&H.id===[st.div,st.a,st.va,st.vv,st.pm,H.kind].join('|')&&!!document.getElementById('r10HmMap');const row=live?H.rows.find(r=>r.key===H.sel):null;
-    if(row){m=row.m;o.cu=row.cu==null?null:row.cu;o.unit=row.unit||'';o.item=row.name;o.itemCode=row.key;o.where=`${a.name} · ${v.name} · ${row.name}`;}
+    if(row){m=row.m;o.cu=row.cu==null?null:row.cu;o.q=row.q==null?null:row.q;o.unit=row.unit||'';o.item=row.name;o.itemCode=row.key;o.where=`${a.name} · ${v.name} · ${row.name}`;}
     const x=g('cmpM')(m);o.ratio=x.rc;}
   else if(st.s>=2&&st.a&&st.a!=='price'&&st.a!=='vd'){const i=g('cur')();if(i){o.account=i.title+(i.code&&/^[0-9]{4}$/.test(i.code)?`(${i.code})`:'');o.code=/^[0-9]{4}$/.test(i.code||'')?i.code:'';o.where=i.title;
     let m=i.m;const live=st.s===3&&H&&H.sel&&H.id===[st.div,st.a,st.va,st.vv,st.pm,H.kind].join('|')&&!!document.getElementById('r10HmMap');const row=live?H.rows.find(r=>r.key===H.sel):null;
-    if(row){m=row.m;o.cu=row.cu==null?null:row.cu;o.unit=row.unit||'';if(H.kind==='vend'){o.vendor=row.name;}else{o.item=row.name;o.itemCode=row.key;if(row.vns&&row.vns.length===1)o.vendor=row.vns[0];}o.where=`${i.title} · ${row.name}`;}
+    if(row){m=row.m;o.cu=row.cu==null?null:row.cu;o.q=row.q==null?null:row.q;o.unit=row.unit||'';if(H.kind==='vend'){o.vendor=row.name;}else{o.item=row.name;o.itemCode=row.key;if(row.vns&&row.vns.length===1)o.vendor=row.vns[0];}o.where=`${i.title} · ${row.name}`;}
     else if(st.v&&st.s===3){o.vendor='';}
     if(m){const x=g('cmpM')(m);o.ratio=x.rc;}}}
  }catch(e){}
@@ -34,30 +34,38 @@ function ctx(){const o={account:'',code:'',vendor:'',item:'',itemCode:'',cu:null
 // ---------- 화면 ----------
 function priceMethod(m){return m==='단가절감'||m==='업체변경';}
 function build(){const root=$('planSide');if(!root||root.dataset.built)return;root.dataset.built='1';
- root.innerHTML=`<div class="ps-h"><div class="ps-t">절감계획</div><div class="ps-s">어느 화면에서나 적어요. 저장 전 내용은 화면을 옮겨도 남아요.</div></div>
+ root.innerHTML=`<div class="ps-h"><button type="button" class="ps-tg" id="psTg" aria-expanded="false"><span class="ps-t">절감계획</span><span class="ps-tgs" id="psTgs"></span></button><div class="ps-s">어느 화면에서나 적어요. 저장 전 내용은 화면을 옮겨도 남아요.</div></div>
  <div class="ps-body">
  <div class="ps-ctx" id="psCtx" aria-live="polite"></div>
- <div class="ps-g" role="radiogroup" aria-label="절감 방법"><div class="ps-l">절감 방법을 먼저 골라요</div><div class="ps-m">${METHODS.map(m=>`<label class="ps-r"><input type="radio" name="psMethod" value="${m}"><span>${m}</span></label>`).join('')}</div></div>
+ <div class="ps-g" role="radiogroup" aria-label="절감 방법"><div class="ps-l">절감 방법을 먼저 골라요 <span class="ps-req">필수</span></div><div class="ps-m">${METHODS.map(m=>`<label class="ps-r"><input type="radio" name="psMethod" value="${m}"><span>${m}</span></label>`).join('')}</div><div class="ps-e" id="psMethodErr" role="alert"></div></div>
  <div class="ps-g" id="psVals"></div>
- <div class="ps-g"><label class="ps-l" for="psPlan">절감계획 <span class="ps-o">자유롭게 적어요</span></label><textarea id="psPlan" rows="5" maxlength="800" placeholder="어떻게 줄일지 편하게 적어 주세요"></textarea></div>
+ <div class="ps-g ps-two"><div><label class="ps-l" for="psOwn">담당</label><input id="psOwn" type="text" maxlength="100"></div><div><label class="ps-l" for="psDue">기한 <span class="ps-req">필수</span></label><input id="psDue" type="text" inputmode="numeric" placeholder="2026-12-31" maxlength="10"><div class="ps-e" id="psDueErr" role="alert"></div></div></div>
+ <div class="ps-g"><label class="ps-l" for="psPlan">절감계획 <span class="ps-o">자유롭게 적어요</span></label><textarea id="psPlan" rows="3" maxlength="800" placeholder="어떻게 줄일지 편하게 적어 주세요"></textarea></div>
  <div class="ps-g"><label class="ps-l" for="psReason">사유 <span class="ps-req">필수</span></label><textarea id="psReason" rows="3" maxlength="1500" placeholder="왜 이 계획을 세웠는지 자유롭게 적어 주세요"></textarea><div class="ps-e" id="psReasonErr" role="alert"></div></div>
 
- <button type="button" class="ps-b" id="psSave">저장</button><div class="ps-msg" id="psMsg" role="status" aria-live="polite"></div></div>`;
+ </div><div class="ps-foot"><div class="ps-sum" id="psSum"></div><button type="button" class="ps-b" id="psSave">저장</button><div class="ps-msg" id="psMsg" role="status" aria-live="polite"></div></div>`;
  root.addEventListener('input',e=>{const t=e.target;
-  if(t.id==='psPlan')D.plan=t.value;else if(t.id==='psReason'){D.reason=t.value;$('psReasonErr').textContent='';}else if(t.id==='psTgt')D.target=t.value;
+  if(t.id==='psOwn')D.owner=t.value;else if(t.id==='psDue')D.due=t.value;else if(t.id==='psPlan')D.plan=t.value;else if(t.id==='psReason'){D.reason=t.value;$('psReasonErr').textContent='';}else if(t.id==='psTgt'){D.target=t.value;est();}
   else if(t.name==='psMethod'){D.method=t.value;D.target='';vals();}
-  save();});
- $('psSave').onclick=submit;
+  clearErr();reqSum();save();});
+ $('psSave').onclick=submit;$('psTg').onclick=()=>{D.open=!D.open;save();fold();};
  sync();}
 function sync(){const r=$('planSide');if(!r)return;
  r.querySelectorAll('input[name=psMethod]').forEach(x=>{x.checked=x.value===D.method;});
- [['psPlan',D.plan],['psReason',D.reason]].forEach(([id,v])=>{const e=$(id);if(e&&e.value!==v)e.value=v;});
+ [['psPlan',D.plan],['psReason',D.reason],['psOwn',D.owner],['psDue',D.due]].forEach(([id,v])=>{const e=$(id);if(e&&e.value!==v)e.value=v;});
  vals();}
 // 방법별 칸: 단가절감·업체변경 = 현재 단가(자동) + 목표 단가, 사용량 절감 = 현재 매출 대비 비율(자동) + 목표 비율
-function vals(){const box=$('psVals');if(!box)return;const c=ctx();const m=D.method;
+function defaults(){const me=(typeof V5!=='undefined'&&V5.ST&&V5.ST.me)||null;if(!D.owner&&me&&me.name){D.owner=me.name;}if(!D.due)D.due=DUE;const o=$('psOwn');if(o&&o.value!==D.owner)o.value=D.owner;const d=$('psDue');if(d&&d.value!==D.due)d.value=D.due;}
+// 선택(거래처·품목)이 없고 쓴 내용도 없으면 접어 둬요
+function fold(){const r=$('planSide');if(!r)return;const c=ctx();const has=!!(c.vendor||c.item)||D.plan.trim()||D.reason.trim()||D.open;r.classList.toggle('ps-folded',!has);const tg=$('psTg');if(tg)tg.setAttribute('aria-expanded',String(!!has));const s=$('psTgs');if(s)s.textContent=has?'':'거래처·품목을 고르면 펼쳐져요';}
+function est(){const e=$('psEst');if(!e)return;const c=ctx();const t=parseNum(D.target);if(!priceMethod(D.method)||t.err||t.v==null||c.cu==null||c.q==null){e.innerHTML='';return;}
+ if(t.v>=c.cu){e.innerHTML='<div class="ps-est1 warn">목표 단가가 현재 단가보다 낮아야 절감액이 계산돼요.</div>';return;}const m=(c.cu-t.v)*c.q;
+ e.innerHTML=`<div class="ps-est1">월 절감 예상 약 ${man(m)}</div><div class="ps-est2">(현재 ${fmt(c.cu)}원 - 목표 ${fmt(t.v)}원) × 월 수량 ${fmt(c.q)}</div>`;}
+const man=n=>{const v=Math.round(n/1e4);return v>=1e4?`${Math.floor(v/1e4)}억 ${(v%1e4).toLocaleString('ko-KR')}만원`:`${v.toLocaleString('ko-KR')}만원`;};
+function vals(){defaults();const box=$('psVals');if(!box)return;const c=ctx();const m=D.method;
  const cxt=$('psCtx');if(cxt)cxt.textContent=c.where?`지금 보는 곳 · ${c.where}`:'지금 보는 곳 · 계정이나 칸을 고르면 여기에 나와요';
  if(priceMethod(m)){const cur=c.cu!=null?`${fmt(c.cu)}원${c.unit?' / '+c.unit:''}`:'';const had=box.dataset.k==='price';
-  if(!had){box.dataset.k='price';box.innerHTML=`<div class="ps-l">현재 단가 <span class="ps-o">자동</span></div><div class="ps-v" id="psCur"></div><label class="ps-l" for="psTgt">목표 단가(원)</label><input id="psTgt" type="text" inputmode="decimal" autocomplete="off" placeholder="예) 1200"><div class="ps-e" id="psTgtErr" role="alert"></div>`;}
+  if(!had){box.dataset.k='price';box.innerHTML=`<div class="ps-l">현재 단가 <span class="ps-o">자동</span></div><div class="ps-v" id="psCur"></div><label class="ps-l" for="psTgt">목표 단가(원)</label><input id="psTgt" type="text" inputmode="decimal" autocomplete="off" placeholder="예) 1200"><div class="ps-est" id="psEst" aria-live="polite"></div><div class="ps-e" id="psTgtErr" role="alert"></div>`;}
   $('psCur').textContent=cur||'품목 칸이나 단가 상세를 열면 현재 단가가 자동으로 들어가요';$('psCur').dataset.v=c.cu==null?'':String(c.cu);
   const t=$('psTgt');if(t&&t.value!==D.target)t.value=D.target;}
  else if(m==='사용량 절감'){const cur=c.ratio!=null?`${c.ratio.toFixed(2)}%`:'';const had=box.dataset.k==='ratio';
@@ -65,23 +73,27 @@ function vals(){const box=$('psVals');if(!box)return;const c=ctx();const m=D.met
   $('psCur').textContent=cur||'계정을 고르면 현재 매출 대비 비율이 자동으로 들어가요';$('psCur').dataset.v=c.ratio==null?'':String(c.ratio);
   const t=$('psTgt');if(t&&t.value!==D.target)t.value=D.target;}
  else{box.dataset.k=m?'etc':'';box.innerHTML=m?'<div class="ps-note">기타는 아래 절감계획 칸에 자유롭게 적어요.</div>':'<div class="ps-note">방법을 고르면 현재값과 목표값 칸이 나와요.</div>';}
- }
+ est();fold();reqSum();}
 function parseNum(s){s=String(s==null?'':s).replace(/[\s,%원]/g,'');if(!s)return {v:null};return /^[0-9]+(\.[0-9]+)?$/.test(s)?{v:Number(s)}:{err:'숫자로 적어 주세요(예 1200).'};}
 function say(t,kind){const m=$('psMsg');if(!m)return;m.className='ps-msg'+(kind?' '+kind:'');m.textContent=t;}
 
 // ---------- 저장 ----------
 function payload(c){const st=g('st');const div=DIVID[st.div]||'PROD';const m=D.method;const tgt=parseNum(D.target);
  const memo=[D.plan.trim(),m==='단가절감'||m==='업체변경'?(tgt.v!=null?`목표 단가 ${fmt(tgt.v)}원`:'')+($('psCur')&&$('psCur').dataset.v?` (현재 단가 ${fmt(Number($('psCur').dataset.v))}원)`:''):m==='사용량 절감'?(tgt.v!=null?`목표 매출 대비 비율 ${tgt.v}%`:'')+($('psCur')&&$('psCur').dataset.v?` (현재 ${Number($('psCur').dataset.v).toFixed(2)}%)`:''):''].filter(Boolean).join('\n').slice(0,1000);
- const plan={account:c.account||'전체',vendor:c.vendor||'전체',method:m,due:DUE,basis:D.reason.trim(),target:'',target_amount_krw:null,state:'계획',turns:[]};
+ const plan={account:c.account||'전체',vendor:c.vendor||'전체',method:m,due:D.due.trim()||DUE,owner:D.owner.trim()||undefined,basis:D.reason.trim(),target:'',target_amount_krw:null,state:'계획',turns:[]};
  if(memo)plan.memo=memo;if(m==='사용량 절감'&&tgt.v!=null&&tgt.v<=100)plan.target_ratio=tgt.v;
  if(tgt.v!=null&&(priceMethod(m)||m==='사용량 절감'))plan.target_note=priceMethod(m)?`목표 단가 ${fmt(tgt.v)}원${c.unit?'/'+c.unit:''}`:`목표 비율 ${tgt.v}%`;
  if(c.itemCode&&div==='PROD'&&c.item)plan.item_code=c.itemCode;
  return {plan,division:div,account_code:c.code||null,page:'절감계획 사이드바',manual:true};}
-async function submit(){if(busy)return;const c=ctx();say('');$('psReasonErr').textContent='';const te=$('psTgtErr');if(te)te.textContent='';
- if(!D.method){say('절감 방법을 먼저 골라 주세요.','err');return;}
- if(!D.reason.trim()){$('psReasonErr').textContent='사유를 적어 주세요. 사유 없이는 저장할 수 없어요.';$('psReason').focus();say('사유를 적어 주세요.','err');return;}
- const tg=parseNum(D.target);if(tg.err){if(te)te.textContent=tg.err;say(tg.err,'err');return;}
- if(D.method==='사용량 절감'&&tg.v!=null&&tg.v>100){if(te)te.textContent='목표 비율은 0~100 사이로 적어 주세요.';say('목표 비율은 0~100 사이로 적어 주세요.','err');return;}
+function reqSum(){const e=$('psSum');if(!e)return;const miss=[];if(!D.method)miss.push('절감 방법');if(!D.reason.trim())miss.push('사유');if(!/^\d{4}-\d{2}-\d{2}$/.test((D.due||'').trim()))miss.push('기한');e.textContent=miss.length?`필수 항목 남음 · ${miss.join(' · ')}`:'필수 항목을 모두 적었어요';e.classList.toggle('ok',!miss.length);}
+function clearErr(){['psMethodErr','psReasonErr','psDueErr','psTgtErr'].forEach(id=>{const x=$(id);if(x)x.textContent='';});}
+async function submit(){if(busy)return;const c=ctx();say('');clearErr();
+ if(!D.method){$('psMethodErr').textContent='절감 방법을 골라 주세요.';return;}
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(D.due.trim()||DUE)){$('psDueErr').textContent='기한은 2026-12-31 모양으로 적어 주세요.';return;}
+ if(!D.reason.trim()){$('psReasonErr').textContent='사유를 적어 주세요. 사유 없이는 저장할 수 없어요.';$('psReason').focus();return;}
+ const tg=parseNum(D.target);const te=$('psTgtErr');
+ if(tg.err){if(te)te.textContent=tg.err;return;}
+ if(D.method==='사용량 절감'&&tg.v!=null&&tg.v>100){if(te)te.textContent='목표 비율은 0~100 사이로 적어 주세요.';return;}
  busy=true;$('psSave').disabled=true;say('시트 상태를 확인하는 중이에요');
  try{vals();const p=payload(c);
   say('저장하는 중이에요');

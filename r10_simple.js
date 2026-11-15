@@ -35,37 +35,38 @@ function vendLine(i){if(!isP()||!i.drivers)return '';const d=i.drivers.filter(x=
 function issueRow(i,k){const up=upOf(i);const big=i.nd?ND:amtMode()?`월 ${manS(i.d)}`:(i.pp==null?V5.NOS:ppS(i.pp));
  const sub=i.nd?'':i.r!=null?`${i.r>=0?'+':''}${i.r.toFixed(1)}%`:'';
  return `<button class="r10-row" data-issue="${esc(i.id)}"><span class="r10-rk">${k+1}</span><span class="r10-nm"><span class="r10-t">${esc(i.title)}</span><span class="r10-s">${esc(reasonTxt(i))}</span>${vendLine(i)}</span>${sparkSvg(series(i.m),up)}<span class="r10-v ${i.nd?'nd':up?'up':'dn'}"><span class="r10-big num">${big}</span><span class="r10-sub num">${sub}</span></span><span class="r10-cv" aria-hidden="true">›</span></button>`;}
-function priceRowR(i,k){return `<button class="r10-row" data-r10pm="${esc(i.c)}"><span class="r10-rk">${k+1}</span><span class="r10-nm"><span class="r10-t">${esc(i.n)}</span><span class="r10-s num">${f(i.pu)}원 → ${f(i.cu)}원</span></span>${sparkSvg(unitSeries(i.m),true)}<span class="r10-v up"><span class="r10-big num">${pctS(i.chg)}</span><span class="r10-sub">${CC().s}</span></span><span class="r10-cv" aria-hidden="true">›</span></button>`;}
+const prevBuyMissing=()=>{const C=CC();return !(M2.items||[]).some(it=>Object.entries(it.m||{}).some(([y,v])=>C.prev.includes(y)&&v&&v[1]>0));};
+function priceRowR(i,k){return `<button class="r10-row" data-r10pm="${esc(i.c)}"><span class="r10-rk">${k+1}</span><span class="r10-nm"><span class="r10-t">${esc(i.n)}</span><span class="r10-s num">${f(i.pu)}원 → ${f(i.cu)}원 · 월 ${manS(i.imp/CC().cur.length)}</span></span>${sparkSvg(unitSeries(i.m),true)}<span class="r10-v up"><span class="r10-big num">${pctS(i.chg)}</span><span class="r10-sub">월 ${manS(i.imp/CC().cur.length)}</span></span><span class="r10-cv" aria-hidden="true">›</span></button>`;}
 function kpi(lbl,big,sub,attr,sp){return `<button class="r10-kpi" ${attr}><span class="r10-kl">${lbl}</span><span class="r10-kb num">${big}</span><span class="r10-ks">${sub}</span>${sp||''}</button>`;}
 
 const roOf=w=>{const c=String(w||'').slice(-1).charCodeAt(0);if(!(c>=0xAC00&&c<=0xD7A3))return '로';const j=(c-0xAC00)%28;return j===0||j===8?'로':'으로';};
 function introHtml(){const C=CC();const BL=V5.basisLabel()||'매출';return `<section class="r10-intro" id="r10Intro" aria-label="앱 안내"><div class="r10-it">늘어난 비용의 원인을 찾아 절감 계획으로 남기는 앱이에요.</div>
-  <div class="r10-is" id="r10Steps"><span><b>1</b> 비용 보기</span><span aria-hidden="true">›</span><span><b>2</b> 거래처·품목 찾기</span><span aria-hidden="true">›</span><span><b>3</b> 계획 쓰기</span></div>
+
   <details class="r10-help" id="r10Help"><summary>용어 한 줄 설명 · ${esc(C.pl)} 대비 · %p · ${esc(BL)} 기준 · 원장 외 차이 · ${ND}</summary><ul>
   <li><b>${esc(C.pl)} 대비</b> ${esc(C.pl)} 월평균과 이번 ${esc(C.cl)} 월평균을 비교해요(위 비교 단추에서 바꿔요).</li>
   <li><b>%p</b> 비율이 몇 %포인트 달라졌는지예요(예: 3.5% → 4.4% = +0.9%p).</li>
   <li><b>${esc(BL)} 기준</b> 비용을 ${esc(BL)}${roOf(BL)} 나눈 비율(%)로 봐요.</li>
   <li><b>원장 외 차이</b> 계정 마감 금액 중 이카운트 원장 업체 줄로 설명되지 않는 몫이에요.</li>
   <li><b>${ND}</b> 비교할 이전 기간 줄이 없어서 증감을 계산하지 않아요.</li></ul></details></section>`;}
-function step1(){const I=issues();const tm=isP()?prodMonthly():oMonthly(view(),'ALL',null,true);const tc=tots(tm);const x=cmpM(tm);
+function step1(){const IALL=issues();const I=IALL.filter(i=>!(i.pp!=null&&i.pp<=0));const IL=IALL.filter(i=>i.pp!=null&&i.pp<=0);/* COST1113: 비율이 오른 것만 '늘어난 비용', 금액만 늘고 비율은 줄어든 것은 따로 */const tm=isP()?prodMonthly():oMonthly(view(),'ALL',null,true);const tc=tots(tm);const x=cmpM(tm);
  const NDI=issues(true).filter(i=>i.nd);const N=5;const shown=st.more?I:I.slice(0,N);const pi=st.div==='prod'?priceIssue():null;const plans=V5.ST.plans.length;
  const totUp=amtMode()?x.d>0:(x.pp!=null&&x.pp>0);
  const K=[kpi(`${divName()} 비용${amtMode()?' · 월평균':' · '+esc(V5.basisLabel())+' 대비'}`,amtMode()?man(st.cmp==='m10'?tm['2610']||0:tc['26Q3']/3):st.cmp==='m10'?V5.vYm(tm['2610']||0,'2610'):vPb(tc['26Q3'],'26Q3'),`<span class="${x.nd?'':totUp?'up':'dn'}">${dPb(tm)}</span> ${CC().s}`,'data-view="hm"',sparkSvg(series(tm),totUp)),
   kpi('늘어난 비용',`${I.length}개`,I.length?`1위 ${esc(I[0].title)}`:'늘어난 비용이 없어요',I.length?`data-issue="${esc(I[0].id)}"`:'disabled'),
-  pi?kpi('원재료 단가',pi.H.its.length?'평균 '+pctS(pi.H.avg):'-',`+15% 이상 ${pi.n15}개`,'data-price="1"'):'',
-  kpi('절감 계획',`${plans}건`,plans?'저장한 계획 보기':'줄 없음','data-step="4"')].join('');
+  pi?kpi('원재료 단가',pi.H.its.length&&!prevBuyMissing()?'평균 '+pctS(pi.H.avg):'-',prevBuyMissing()?`${esc(CC().pl)} 구매 자료 없음`:`금액 가중평균 · +15% 이상 ${pi.n15}개`,'data-price="1"'):'',
+  kpi('절감 계획',`${plans}건`,plans?'저장한 계획 보기':'아직 없음','data-step="4"')].join('');
  const sortDD=dd('r10Sort',st.sort==='rate'?'증가율 순':'증가폭 순',`<button data-sort="amt" class="${st.sort==='amt'?'on':''}">증가폭 순</button><button data-sort="rate" class="${st.sort==='rate'?'on':''}">증가율 순</button>`);
- const hmBtns=hmKinds().map(([k,l])=>`<button class="r10-hm" data-hm="${k}">${l}<span aria-hidden="true">›</span></button>`).join('');
  const prow=pi?pi.imp.slice(0,N):[];
- return `${introHtml()}${guide(I.length?'늘어난 비용 중 하나를 눌러 원인을 봐요. 1위부터 보면 돼요.':'지금은 늘어난 비용 이슈가 없어요. 히트맵에서 전체 비용을 볼 수 있어요.',I.length?`<button class="btn pri sm" id="nextBtn" data-issue="${esc(I[0].id)}">1위 ${esc(I[0].title)} 보기 →</button>`:'<button class="btn sec sm" data-view="hm">히트맵 보기</button>')}
+ return `${introHtml()}${guide(I.length?'늘어난 비용 하나를 눌러 거래처·품목을 봐요.':'늘어난 비용이 없어요.',I.length?`<button class="btn pri sm" id="nextBtn" data-issue="${esc(I[0].id)}">1위 ${esc(I[0].title)} 보기 →</button>`:'<button class="btn sec sm" data-view="hm">히트맵 보기</button>')}
  <div class="r10-kpis" id="r10Kpis">${K}</div>
  <section class="r10-sec" id="r10Issues"><div class="r10-sh"><div><div class="r10-st">지금 살펴볼 비용 이슈</div><div class="r10-ss" id="divSum">${CC().cl} vs ${CC().pl} 월평균 · 인건비 묶음 제외</div></div>${sortDD}</div>
  <div class="r10-list" id="issueList">${I.length?shown.map(issueRow).join(''):emptyBox('issuesEmpty',`${CC().pl}보다 늘어난 ${isP()?'계정':'항목'}이 없어요`,`위에서 비교 기준을 바꾸면 다른 기간과 비교해 볼 수 있어요.`)}</div>
  ${I.length>N?`<button class="r10-more" id="moreIssues" aria-expanded="${st.more}">${st.more?'접기':`더 보기 ${I.length-N}개`}<span aria-hidden="true">${st.more?' ⌃':' ⌄'}</span></button>`:''}
+ ${IL.length?`<details class="r10-down" id="r10Down"><summary>금액은 늘었지만 비율은 줄어든 비용 ${IL.length}개</summary><div class="r10-list">${IL.map((i,k)=>issueRow(i,k)).join('')}</div></details>`:''}
  ${NDI.length?`<div class="r10-note" id="ndIssues">${CC().pl} 비교 기간 없는 ${NDI.length}개(${esc(NDI.map(i=>i.title).join(', '))})는 ${ND}이라 순위에서 뺐어요.</div>`:''}</section>
- ${pi?`<section class="r10-sec" id="r10Price"><div class="r10-sh"><div><div class="r10-st">단가가 오른 원재료</div><div class="r10-ss">${CC().s} · 영향이 큰 순</div></div><button class="r10-link" data-price="1">전체 보기 ›</button></div><div class="r10-list">${prow.length?prow.map(priceRowR).join(''):'<div class="r10-note">단가가 오른 원재료가 없어요</div>'}</div></section>`:''}
+ ${pi?`<section class="r10-sec" id="r10Price"><div class="r10-sh"><div><div class="r10-st">단가가 오른 원재료</div><div class="r10-ss">${CC().s} · 월 영향이 큰 순 · 평균은 금액 가중평균</div></div><button class="r10-link" data-price="1">전체 보기 ›</button></div><div class="r10-list">${prow.length?prow.map(priceRowR).join(''):`<div class="r10-note">${prevBuyMissing()?`비교 기간(${esc(CC().pl)}) 구매 자료가 아직 없어요`:'단가가 오른 원재료가 없어요'}</div>`}</div></section>`:''}
  ${st.div==='mgmt'?`<section class="r10-sec" id="r10Cc"><div class="r10-sh"><div><div class="r10-st">공통비 입력</div><div class="r10-ss">직접 입력 · 실제 비용으로 보고 위 금액에 더해요(원장에 이미 있는 달은 안 더해요)${CCS.loaded?` · 지금 ${CCS.items.length}건`:''}</div></div></div><div class="r10-hms"><button class="r10-hm" id="ccOpen" data-cc="1">공통비 입력하기<span aria-hidden="true">›</span></button></div></section>`:''}
- <section class="r10-sec" id="r10Hm"><div class="r10-sh"><div><div class="r10-st">히트맵으로 한눈에</div><div class="r10-ss">비용 전체를 색으로 봐요</div></div></div><div class="r10-hms">${hmBtns}</div></section>`;}
+`;}
 
 window.R10HOOK=function(){window.topbar=topbar;window.stepper=stepper;window.step1=step1;
  const M=document.getElementById('main');

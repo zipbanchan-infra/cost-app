@@ -7,7 +7,7 @@
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DIVS=[['PROD','prod','생산본부'],['ONLINE','online','온라인본부'],['MGMT','mgmt','경영지원본부']];
 const STATES=['계획','진행','완료','보류'];
-const R={drafts:{},add:null,pre:null,msg:{},busy:{},aiBusy:{},addMsg:'',gone:false,view:'acct',q:'',fdiv:'',hl:null};   // drafts[id] = 아직 저장 안 한 고친 값
+const R={moreOpen:false,drafts:{},add:null,pre:null,msg:{},busy:{},aiBusy:{},addMsg:'',gone:false,view:'acct',q:'',fdiv:'',hl:null};   // drafts[id] = 아직 저장 안 한 고친 값
 const F=n=>Math.round(n).toLocaleString('ko-KR');
 const stateOf=p=>STATES.includes(p.state)?p.state:(p.status==='초안'||!p.status?'계획':(STATES.includes(p.status)?p.status:'계획'));
 // ---------- 현재 금액(월평균, 비교 기간의 이번 기간 달들) ----------
@@ -23,7 +23,7 @@ function curAvg(div,code,vendor){
  return ys.reduce((a,y)=>a+(m[y]!=null?(typeof m[y]==='number'?m[y]:m[y][0]):0),0)/ys.length;}
 function vendNat(div,code,name){const nm=String(name||'').trim();const L=div==='ONLINE'?(((DB.ovend||[]).find(a=>a.code===code)||{}).vend||[]):(((div==='MGMT'?DB.mgmt:DB.prod).vend||{})[code]||[]);const v=L.find(x=>x.name===nm);return v&&DB.vnat&&DB.vnat[v.code]||'';}
 const itemKind=(div,code,vendor)=>(vendor&&vendMonths(div,code,vendor)?'거래처':'계정 전체')+(vendNat(div,code,vendor)?' · '+vendNat(div,code,vendor):'');
-function basisText(cur){return cur==null?`현재 금액 줄 없음(${CC().cl})`:`현재 ${CC().cl} 월평균 ${F(cur)}원`;}
+function basisText(cur){return cur==null?`현재 금액 아직 없음(${CC().cl})`:`현재 ${CC().cl} 월평균 ${F(cur)}원`;}
 // ---------- 목표 금액 <-> 비율 ----------
 // r13 c5(본부장님 10/30 결정 6): 목표는 월 단위 - 비율 = 목표 금액(월) ÷ 현재 월평균 x 100. 예전 분기 목표(target_unit 없음)는 3으로 나눠 월로 보여요
 const ratioOf=(amt,cur)=>amt!=null&&cur>0?Math.round(amt/cur*1000)/10:null;
@@ -51,7 +51,7 @@ function itemOpts(div,code){if(div!=='PROD'||!code)return [];const N=itemNames()
 const itemName=c=>c?(itemNames()[c]||c):'';
 const itemLabel=c=>c?`${itemName(c)}(${c})`:'';   // c13(4): 품목 이름이 숫자뿐인 것(예: 이름 '10103' = 코드 ZIP_S_6108)이 코드로 읽혀서 이름(코드)로 같이 보여요
 function itemSel(attr,div,code,val,label){const O=itemOpts(div,code);
- if(div!=='PROD'||!code||(!O.length&&!val))return `<select class="r13-in" ${attr} data-nodev="1" disabled aria-label="${label}"><option value="">${code?'품목 줄 없음':'계정을 먼저'}</option></select>`;
+ if(div!=='PROD'||!code||(!O.length&&!val))return `<select class="r13-in" ${attr} data-nodev="1" disabled aria-label="${label}"><option value="">${code?'품목 아직 없음':'계정을 먼저'}</option></select>`;
  const has=!val||O.some(o=>o.c===val);const L=has?O:O.concat([{c:val,n:itemName(val)}]);
  return `<select class="r13-in" ${attr} data-nodev="1" aria-label="${label}"><option value="">(비워 둠)</option>${L.map(o=>`<option value="${esc(o.c)}"${o.c===val?' selected':''}>${esc(o.n)}(${esc(o.c)})</option>`).join('')}</select>`;}
 const allowedDivs=()=>DIVS.filter(d=>ALLOWED.has(d[0]));
@@ -64,7 +64,7 @@ function rowVal(p){const d=R.drafts[p.id]||{};const cur=curAvg(p.division,p.acco
 const dirty=id=>!!R.drafts[id]&&Object.keys(R.drafts[id]).length>0;
 const anyDirty=()=>Object.keys(R.drafts).some(dirty)||!!(R.add&&['vendor','item','method','owner','due','memo','amt','ratio'].some(k=>R.add[k]));
 // ---------- 그리기 ----------
-function ensureAdd(){if(!R.add){const dv=allowedDivs().map(d=>d[0]);const d0=(DIVS.find(x=>x[1]===st.div&&ALLOWED.has(x[0]))||allowedDivs()[0]||DIVS[0])[0];R.add={div:d0,code:'',vendor:'',item:'',method:'',owner:'',due:'',memo:'',state:'계획',amt:'',ratio:''};}
+function ensureAdd(){if(!R.add){const dv=allowedDivs().map(d=>d[0]);const d0=(DIVS.find(x=>x[1]===st.div&&ALLOWED.has(x[0]))||allowedDivs()[0]||DIVS[0])[0];R.add={div:d0,code:'',vendor:'',item:'',method:'',owner:(V5.ST.me&&V5.ST.me.name)||'',due:'',memo:'',state:'계획',amt:'',ratio:''};}
  if(R.pre){const p=R.pre;R.pre=null;R.add=Object.assign(R.add,{div:p.div,code:p.code,vendor:p.vendor||'',item:p.item||'',method:'',amt:'',ratio:''});R.focusAdd=true;}
  const A=R.add;if(!allowedDivs().some(d=>d[0]===A.div))A.div=(allowedDivs()[0]||DIVS[0])[0];
  if(A.code&&!accounts(A.div).some(a=>a.code===A.code))A.code='';
@@ -81,19 +81,21 @@ function addHtml(){ensureAdd();const A=R.add;const acc=accounts(A.div);const cur
   <div class="r13-add-h"><b>+ 계획 추가</b><span class="r13-hint">본부·계정을 고르고 거래처·품목(생산본부만 목록에서 골라요, 비워 둬도 돼요)·방법·기한을 적은 뒤 ‘계획 저장’을 눌러요. 현재 금액·근거는 자동으로 채워져요.</span></div>
   ${sumLine(A)}
   <div class="r13-grid">
-   ${fld('본부',`<select id="r13aDiv" class="r13-in">${allowedDivs().map(d=>`<option value="${d[0]}"${d[0]===A.div?' selected':''}>${d[2]}</option>`).join('')}</select>`)}
    ${fld('계정',`<select id="r13aAcc" class="r13-in"><option value="">계정을 골라 주세요</option>${acc.map(a=>`<option value="${esc(a.code)}"${a.code===A.code?' selected':''}>${esc(a.name)} ${esc(a.code)}</option>`).join('')}</select>`)}
    ${fld('거래처',`<input id="r13aVen" class="r13-in" list="r13Vend" value="${esc(A.vendor)}" maxlength="200" autocomplete="off" placeholder="예) 거래처 이름"><datalist id="r13Vend">${A.code?vendList(A.div,A.code).map(n=>`<option value="${esc(n)}">`).join(''):''}</datalist>`)}
+   ${fld('목표 금액(월, 원)',`<input id="r13aAmt" class="r13-in num" inputmode="numeric" value="${esc(A.amt)}" autocomplete="off" placeholder="예) 3000000">`)}
+   ${fld('기한',`<input id="r13aDue" class="r13-in num" value="${esc(A.due)}" inputmode="numeric" autocomplete="off" placeholder="2026-12-31">`)}
+  </div>
+  <details class="r13-more" id="r13More"${R.moreOpen||R.focusAdd?' open':''}><summary>더 입력 <span class="r13-hint">본부·품목·방법·목표 비율·담당·상태·메모 (접어 두어도 적은 값은 그대로 저장돼요)</span></summary><div class="r13-grid">
+   ${fld('본부',`<select id="r13aDiv" class="r13-in">${allowedDivs().map(d=>`<option value="${d[0]}"${d[0]===A.div?' selected':''}>${d[2]}</option>`).join('')}</select>`)}
    ${fld('품목',itemSel('id="r13aItem"',A.div,A.code,A.item,'품목'))}
    ${fld('현재 금액(월평균)',`<output id="r13aCur" class="r13-cur num">${cur==null?'-':F(cur)+'원'}</output>`)}
-   ${fld('목표 금액(월, 원)',`<input id="r13aAmt" class="r13-in num" inputmode="numeric" value="${esc(A.amt)}" autocomplete="off" placeholder="예) 3000000">`)}
    ${fld('목표 비율(%)',`<input id="r13aRat" class="r13-in num" inputmode="decimal" value="${esc(A.ratio)}" autocomplete="off" placeholder="예) 10">`)}
    ${fld('방법',`<input id="r13aMet" class="r13-in" value="${esc(A.method)}" maxlength="500" autocomplete="off" placeholder="예) 거래처를 바꿔 단가 낮추기">`,'r13-w')}
    ${fld('담당',`<input id="r13aOwn" class="r13-in" value="${esc(A.owner)}" maxlength="100" autocomplete="off">`)}
-   ${fld('기한',`<input id="r13aDue" class="r13-in num" value="${esc(A.due)}" inputmode="numeric" autocomplete="off" placeholder="2026-12-31">`)}
    ${fld('상태',stSel('r13aSt',A.state))}
    ${fld('메모',`<input id="r13aMemo" class="r13-in" value="${esc(A.memo)}" maxlength="1000" autocomplete="off">`,'r13-w')}
-  </div>
+  </div></details>
   <div class="r13-add-b"><button type="button" class="btn pri sm" id="r13aSave"${R.busy.add?' disabled aria-busy="true"':''}>${R.busy.add?'<span class="ai-spin" aria-hidden="true"></span>저장하는 중이에요':'계획 저장'}</button>
    <button type="button" class="btn sec sm" id="r13aAi"${R.aiBusy.add||!R.add.code?' disabled':''} title="${R.add.code?'빈 칸(방법·목표 금액·기한)에 제안만 채워요. 저장은 ‘계획 저장’을 눌러야 해요':'계정을 고르면 켜져요'}">${R.aiBusy.add?'초안 만드는 중이에요':'AI 초안 채우기'}</button>
    <span class="r13-hint" id="r13aAiHint" data-state="${R.add.code?'on':'off'}">${R.add.code?(gemOn()?'켜짐 · 빈 칸(방법·목표 금액·기한)에 Gemini 제안을 채워요. 저장은 ‘계획 저장’을 눌러야 해요.':'켜짐 · 빈 칸(방법·목표 금액·기한)에 예시 초안을 채워요(Gemini 연결 전). 저장은 ‘계획 저장’을 눌러야 해요.'):'꺼짐 · 계정을 고르면 켜져요.'}</span>
@@ -103,7 +105,7 @@ function rowHtml(p){const v=rowVal(p),id=p.id,dr=dirty(id),m=R.msg[id]||'';
  return `<tr class="r13-row${dr?' dirty':''}${String(R.hl)===String(id)?' r13-hl':''}" data-r13row="${id}">
   <td data-l="거래처" class="r13-c-item"><div class="r13-iw">${inp('vendor',v.vendor,'',' maxlength="200" aria-label="거래처"')}<span class="r13-kind">${esc(itemKind(p.division,p.account_code,v.vendor))}${p.example?' · AI 초안':''}</span></div></td>
   <td data-l="품목" class="r13-c-it">${itemSel(`data-r13="item" data-id="${id}"`,p.division,p.account_code,v.item,'품목')}</td>
-  <td data-l="현재 금액(월평균)" class="num r13-cur">${v.cur==null?'<span class="r13-nd">줄 없음</span>':F(v.cur)+'원'}</td>
+  <td data-l="현재 금액(월평균)" class="num r13-cur">${v.cur==null?'<span class="r13-nd">아직 없음</span>':F(v.cur)+'원'}</td>
   <td data-l="목표 금액(월)">${inp('amt',v.amt,'num',' inputmode="numeric" aria-label="목표 금액(월, 원)"')}</td>
   <td data-l="목표 비율(%)">${inp('ratio',v.ratio,'num r13-rat',' inputmode="decimal" aria-label="목표 비율(%)"')}</td>
   <td data-l="방법">${inp('method',v.method,'',' maxlength="500" aria-label="방법"')}</td>
@@ -143,7 +145,7 @@ function viewBar(){const n=shownPlans().length,all=V5.ST.plans.filter(p=>ALLOWED
   <span class="r13-hint" id="r13Cnt" role="status" aria-live="polite">${n===all?`${all}건`:`조건에 맞는 ${n}건 / 전체 ${all}건`}</span></div>`;}
 function sectionHtml(){const C=CC();
  return `<section class="r13-pl" id="r13Pl" aria-label="절감계획 표">
-  <div class="r13-bar"><div><div class="r13-t">절감계획 표</div><div class="r13-sub">직접 적고 고치고 지워요. 현재 금액은 ${esc(C.cl)} 월평균이고 비교 기간을 바꾸면 따라 바뀌어요. 목표는 금액이나 비율 중 하나만 적으면 다른 쪽이 자동으로 채워져요(비율 = 현재 월평균 비용 대비 줄일 %). 같은 본부 누구나 고칠 수 있고 바뀐 내용은 이력에 남아요.</div></div>
+  <div class="r13-bar"><div><div class="r13-t">절감계획 표</div><div class="r13-sub">현재 금액은 ${esc(C.cl)} 월평균이에요. 목표는 금액이나 비율 중 하나만 적으면 다른 쪽이 채워져요.</div></div>
    <button type="button" class="btn sec sm" id="r13Csv">CSV 내려받기</button></div>
   ${addHtml()}
   ${viewBar()}
@@ -188,7 +190,7 @@ function hlScroll(){setTimeout(()=>{const r=document.querySelector('#r13Tbl tr.r
 function refresh(plans){V5.ST.plans=plans;R.top=R.top||'';if(typeof render==='function')render();else rerender();V5.renderAI&&V5.renderAI();}
 async function addRow(){if(R.busy.add)return;const A=R.add;R.addMsg='';R.hl=null;
  const acc=accounts(A.div).find(a=>a.code===A.code);if(!acc){R.addMsg='계정을 골라 주세요.';rerender();return;}
- const cur=curAvg(A.div,A.code,A.vendor);const r=planPayload(A,cur,false);if(r.E){R.addMsg=errText(r.E);rerender();return;}
+ const cur=curAvg(A.div,A.code,A.vendor);const r=planPayload(A,cur,false);if(r.E){R.addMsg=errText(r.E);if(r.E.method||r.E.owner||r.E.target_ratio)R.moreOpen=true;rerender();return;}
  R.busy.add=true;rerender();
  try{const plan=Object.assign({account:`${acc.name}(${acc.code})`,target:'',basis:basisText(cur),turns:[]},r.plan);
   const o=await V5.api('/api/plans','POST',{plan,division:A.div,account_code:A.code,page:'절감계획 탭',manual:true});
@@ -232,7 +234,7 @@ function bind(){const sec=document.getElementById('r13Pl');if(!sec)return;
    [['amt',v.amt],['ratio',v.ratio]].forEach(([kk,val])=>{if(kk!==k){const o=tr.querySelector(`[data-r13="${kk}"]`);if(o)o.value=val;}});
    tr.classList.toggle('dirty',dirty(id));const sb=tr.querySelector('[data-r13save]');if(sb)sb.disabled=!dirty(id)||!!R.busy[id];
    let d=tr.querySelector('.r13-dirty');if(dirty(id)&&!d){d=document.createElement('span');d.className='r13-dirty';d.setAttribute('role','status');d.textContent='● 저장 안 함';tr.querySelector('.r13-act').insertBefore(d,tr.querySelector('.r13-err'));}else if(!dirty(id)&&d)d.remove();
-   const cu=tr.querySelector('.r13-cur');if(cu&&k==='vendor'){cu.innerHTML=v.cur==null?'<span class="r13-nd">줄 없음</span>':F(v.cur)+'원';}
+   const cu=tr.querySelector('.r13-cur');if(cu&&k==='vendor'){cu.innerHTML=v.cur==null?'<span class="r13-nd">아직 없음</span>':F(v.cur)+'원';}
    const kd=tr.querySelector('.r13-kind');if(kd&&k==='vendor')kd.textContent=itemKind(p.division,p.account_code,v.vendor)+(p.example?' · AI 초안':'');};
   i.addEventListener(i.tagName==='SELECT'?'change':'input',on);});
  sec.querySelectorAll('[data-r13view]').forEach(b=>b.onclick=()=>{R.view=b.dataset.r13view;rerender();});
@@ -248,6 +250,7 @@ function bind(){const sec=document.getElementById('r13Pl');if(!sec)return;
   g('r13aVen').oninput=e=>{R.add.vendor=e.target.value;const a=V5.amtParse(R.add.amt);if(!a.err&&a.v!=null){const rt=ratioOf(a.v,curAvg(R.add.div,R.add.code,R.add.vendor));R.add.ratio=rt==null?'':String(rt);g('r13aRat').value=R.add.ratio;}sync();};
   g('r13aAmt').oninput=e=>{R.add.amt=e.target.value;const a=V5.amtParse(e.target.value),cur=R.add.code?curAvg(R.add.div,R.add.code,R.add.vendor):null;if(!a.err){const rt=a.v==null?null:ratioOf(a.v,cur);R.add.ratio=rt==null?'':String(rt);g('r13aRat').value=R.add.ratio;}};
   g('r13aRat').oninput=e=>{R.add.ratio=e.target.value;const r=parseRatio(e.target.value),cur=R.add.code?curAvg(R.add.div,R.add.code,R.add.vendor):null;if(!r.err){const am=r.v==null?null:amtOf(r.v,cur);if(am!=null){R.add.amt=F(am);g('r13aAmt').value=R.add.amt;}}};   /* 비율을 지워도 적어 둔 금액은 그대로 */
+  {const dm=g('r13More');if(dm)dm.addEventListener('toggle',()=>{R.moreOpen=dm.open;});}
   [['r13aMet','method'],['r13aOwn','owner'],['r13aDue','due'],['r13aMemo','memo']].forEach(([id,k])=>{g(id).oninput=e=>{R.add[k]=e.target.value;};});
   g('r13aSt').onchange=e=>{R.add.state=e.target.value;};
   g('r13aItem').onchange=e=>{R.add.item=e.target.value;};

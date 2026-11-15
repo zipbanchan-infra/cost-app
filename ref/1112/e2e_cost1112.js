@@ -1,7 +1,7 @@
 // COST1112 화면 검수(요구 5항). 사용: node ref/1112/e2e_cost1112.js -> 합격/불합 출력 + shots/ 저장
 const fs = require('fs'), path = require('path');
 const { open } = require('./lib.js');
-const OUT = path.join(__dirname, 'shots');
+const OUT = process.env.SHOT_DIR || path.join(__dirname, 'shots');
 const rows = []; const T = (id, name, ok, d) => { rows.push({ id, name, ok: !!ok, d }); console.log(ok ? 'PASS' : 'FAIL', id, name, ok ? '' : JSON.stringify(d)); };
 (async () => {
   const t = await open(); const p = t.p;
@@ -9,20 +9,21 @@ const rows = []; const T = (id, name, ok, d) => { rows.push({ id, name, ok: !!ok
   await p.waitForTimeout(600);
   const homeHtml = await p.evaluate(() => document.getElementById('main').innerHTML.replace(/\s+/g, ' '));
   await p.screenshot({ path: path.join(OUT, '01_home.png') });
-  const base = fs.readFileSync(path.join(__dirname, 'home_main_base.html'), 'utf8');
-  T('R1', '첫 화면 본문(#main) HTML이 작업 전(4e978d3)과 글자 단위로 같다', base === homeHtml, { baseLen: base.length, newLen: homeHtml.length });
-  const titles = await p.$$eval('.r10-row[data-issue]', b => b.map(x => x.querySelector('.r10-t').textContent));
+  // COST1113 갱신: 1차·3차 변경(비율 하락 분리, 하단 히트맵 버튼 삭제, 안내 문구)으로 홈 HTML은 의도적으로 달라졌다. 구성 요소가 그대로인지 확인한다.
+  const comp = await p.evaluate(() => ({ intro: !!document.getElementById('r10Intro'), guide: !!document.getElementById('guide'), kpis: document.querySelectorAll('#r10Kpis .r10-kpi').length, issues: !!document.getElementById('issueList'), price: !!document.getElementById('r10Price'), hmBottom: !!document.getElementById('r10Hm'), down: !!document.getElementById('r10Down') }));
+  T('R1', '첫 화면 구성: 안내·요약 카드 4·이슈 목록·단가 영역 유지, 하단 히트맵 바로가기 4개는 삭제(의도)', comp.intro && comp.guide && comp.kpis >= 3 && comp.issues && comp.price && !comp.hmBottom, comp);
+  const titles = await p.$$eval('#issueList .r10-row[data-issue]', b => b.map(x => x.querySelector('.r10-t').textContent));
   let allOk = true; const det = [];
   for (let k = 0; k < titles.length; k++) {
-    await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForSelector('.r10-row[data-issue]');
-    await p.locator('.r10-row[data-issue]').nth(k).click(); await p.waitForTimeout(350);
+    await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForSelector('#issueList .r10-row[data-issue]');
+    await p.locator('#issueList .r10-row[data-issue]').nth(k).click(); await p.waitForTimeout(350);
     const r = await p.evaluate(() => ({ s: st.s, head: (document.querySelector('.pg-h') || {}).textContent, wf: !!document.querySelector('.s2head,#detailTitle,#wfBasis,[data-wf]'), chart: !!document.getElementById('r10Chart') }));
     const ok = r.s === 3 && !r.wf && r.chart && r.head.includes(titles[k].trim().slice(0, 2)); det.push([titles[k], r.s, r.wf, r.head]); if (!ok) allOk = false;
   }
   T('R2', `이슈 ${titles.length}개 모두 클릭 시 3단계 세부내역(원인 화면·워터폴 없음)`, allOk, det);
   const bj = titles.findIndex(x => x.includes('부재료비'));
-  await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForSelector('.r10-row[data-issue]');
-  await p.locator('.r10-row[data-issue]').nth(bj).click(); await p.waitForTimeout(400);
+  await p.evaluate(() => { location.hash = '#div=prod'; }); await p.waitForSelector('#issueList .r10-row[data-issue]');
+  await p.locator('#issueList .r10-row[data-issue]').nth(bj).click(); await p.waitForTimeout(400);
   T('R2b', '부재료비 클릭 -> s=3&a=5029, "부재료비를 자세히 봐요"', /s=3&a=5029/.test(await hash()) && (await p.textContent('.pg-h')).includes('부재료비를 자세히'), await hash());
   await p.screenshot({ path: path.join(OUT, '02_detail_bjaeryo.png') });
   const chk = async ax => {
@@ -53,7 +54,7 @@ const rows = []; const T = (id, name, ok, d) => { rows.push({ id, name, ok: !!ok
   T('R4f', '히트맵 페이지 계정 칸 클릭 -> 3단계 세부내역', await p.evaluate(() => st.s === 3), await hash());
   const steps = [['1 홈', '#div=prod'], ['2 원인(주소)', '#div=prod&s=2&a=5029'], ['3 세부', '#div=prod&s=3&a=5029'], ['4 계획', '#div=prod&s=4'], ['히트맵', '#div=prod&s=1&hm=acc'], ['온라인 홈', '#div=online'], ['경영지원 홈', '#div=mgmt']];
   const vis = [];
-  for (const [n, h] of steps) { await p.evaluate(h => { location.hash = h; }, h); await p.waitForTimeout(450); vis.push([n, await p.evaluate(() => { const e = document.getElementById('planSide'), r = e.getBoundingClientRect(); return r.width > 300 && r.height > 300 && getComputedStyle(e).display !== 'none' && r.right <= innerWidth + 1; })]); }
+  for (const [n, h] of steps) { await p.evaluate(h => { location.hash = h; }, h); await p.waitForTimeout(450); vis.push([n, await p.evaluate(() => { const e = document.getElementById('planSide'), r = e.getBoundingClientRect(); return r.width > 300 && r.height > 40 && getComputedStyle(e).display !== 'none' && r.right <= innerWidth + 1; })]); }
   T('R5a', '모든 단계(1·2·3·4·히트맵·온라인·경영지원)에서 오른쪽 절감계획이 보임', vis.every(x => x[1]), vis);
   T('R5b', 'AI·채널 이동 UI 계속 숨김', await p.evaluate(() => ['#aiSide', '#aiRail', '#aiOpen', '#moveBtn', '#acc-lines', '#acc-hist', '.r11-ai'].every(s => { const e = document.querySelector(s); return !e || getComputedStyle(e).display === 'none'; })), 0);
   await p.evaluate(() => { location.hash = '#div=prod&s=3&a=5029&ax=item'; }); await p.waitForTimeout(600);

@@ -89,3 +89,19 @@ body.r10 .r10-pr .r13-vb{grid-column:1;justify-self:start;margin:0;height:24px;m
  .r13-tbl tr.r13-row td.num{justify-content:flex-start}
  .r13-tbl .r13-g1 th,.r13-tbl .r13-g2 th{padding:8px 4px}
 }
+
+@media (min-width:821px){
+/* UXFIX3: 계획 표는 열 수(11)에 맞춘 고정 너비로 오른쪽 열이 안 잘리게, 머리글은 줄바꿈 */
+.r13-tw{overflow-x:auto}
+.r13-tbl{table-layout:fixed;min-width:0;width:100%}
+.r13-tbl thead th{white-space:normal;line-height:16px;vertical-align:bottom}
+.r13-tbl thead th:nth-child(1){width:14%}.r13-tbl thead th:nth-child(2){width:11%}.r13-tbl thead th:nth-child(3){width:10%}.r13-tbl thead th:nth-child(4){width:9%}.r13-tbl thead th:nth-child(5){width:8%}.r13-tbl thead th:nth-child(6){width:10%}.r13-tbl thead th:nth-child(7){width:7%}.r13-tbl thead th:nth-child(8){width:9%}.r13-tbl thead th:nth-child(9){width:7%}.r13-tbl thead th:nth-child(10){width:6%}.r13-tbl thead th:nth-child(11){width:9%}
+.r13-tbl td .r13-in,.r13-tbl .r13-row td:nth-child(3) .r13-in,.r13-tbl .r13-row td:nth-child(4) .r13-in,.r13-tbl .r13-iw .r13-in{width:100%;min-width:0!important;box-sizing:border-box;padding:0 6px}
+.r13-tbl td:last-child{white-space:normal}
+.r13-tbl td:last-child .btn{margin:0 4px 4px 0;padding-left:8px;padding-right:8px}
+.r13-tbl td{overflow-wrap:anywhere}
+}
+.r13-more{margin-top:8px}
+.r13-more>summary{cursor:pointer;font-size:13px;font-weight:600;color:#303030}
+.r13-more>summary .r13-hint{font-weight:400;margin-left:6px}
+.r13-more[open]>.r13-grid{margin-top:8px}

@@ -40,7 +40,7 @@ function fixAll(){const M=document.getElementById('main');if(!M)return;const pag
   if(eb&&/인건비/.test(M.textContent.replace(eb.textContent,''))&&leaf(eb)&&!/인건비/.test(eb.textContent))eb.textContent+=' · 인건비 포함';}
  // 5 2단계
  setTxt(M.querySelector('#guideText'),t=>{const m=t.match(/^막대를 누르면 그 (.+)의 상세로 가요\.$/);const jo=w=>{try{return typeof josa==='function'?josa(w,'을','를'):w+'을(를)';}catch(e){return w+'을(를)';}};return m?`가운데 색 막대가 늘어난 이유예요. 누르면 그 ${jo(m[1])} 자세히 봐요.`:null;});
- $$('.wf-ax',M).forEach(e=>setTxt(e,()=>'차이가 잘 보이게 막대 아래쪽을 잘라 그렸어요'));
+ $$('.wf-ax',M).forEach(e=>e.remove());
  $$('.s2head > .spark',M).forEach(sp=>{if(sp.previousElementSibling&&sp.previousElementSibling.classList.contains('r11-cap'))return;
   const w=document.createElement('div');w.className='r11-spw';sp.before(w);const c=document.createElement('div');c.className='r11-cap';c.textContent='월별 흐름 · 진한 막대 = 이번 분기';w.append(c,sp);});
  // 6 3단계 머리·안내·긴 설명

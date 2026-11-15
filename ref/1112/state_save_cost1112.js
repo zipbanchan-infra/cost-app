@@ -114,7 +114,7 @@ const rows = []; const T = (id, name, ok, d) => { rows.push({ id, name, ok: !!ok
   const back = await p.evaluate(async () => (await V5.api('/api/plans')).plans.filter(x => /COST1112 테스트/.test(JSON.stringify(x))).map(x => ({ id: x.id, vendor: x.vendor, due: x.due, method: x.method, basis: x.basis })));
   T('P5', 'API로 다시 읽어도 같은 행 1개', back.length === 1 && back[0].due === '2026-12-31' && back[0].method === '단가절감', back);
   T('P6', '저장 뒤 사이드바 입력 칸 비워짐', (await read()).p === '' && (await read()).r === '', await read());
-  await p.screenshot({ path: path.join(__dirname, 'shots', '09_sidebar_saved.png') });
+  await p.screenshot({ path: path.join(process.env.SHOT_DIR || path.join(__dirname, 'shots'), '09_sidebar_saved.png') });
   // ---- 테스트 행만 삭제(소프트 삭제 = 기존 DELETE 경로) ----
   const id = back[0].id; const nBefore = S[PROD]['P_계획_A'].length;
   const del = await p.evaluate(async id => { try { await V5.api('/api/plans/' + id, 'DELETE'); return (await V5.api('/api/plans')).plans.some(x => x.id === id); } catch (e) { return 'ERR ' + e.status; } }, id);

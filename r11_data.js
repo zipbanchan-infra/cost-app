@@ -19,7 +19,7 @@ const man=n=>{const m=g('man');return m?m(n):fm(n)+'원';};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pct=(v,p)=>v==null?'<span class="r11-nd">비교 기간 없음</span>':`<span class="${v>0.05?'up':v<-0.05?'dn':''}">${v>0?'+':''}${v.toFixed(p==null?1:p)}%</span>`;
 const ppx=v=>v==null?'<span class="r11-nd">-</span>':`<span class="${v>0.005?'up':v<-0.005?'dn':''}">${v>0?'+':''}${Math.abs(v)<0.1?v.toFixed(2):v.toFixed(1)}%p</span>`;
-function C(){const c=g('CC');return c?c():{cur:['2607','2608','2609'],prev:['2507','2508','2509'],cl:'2026 Q3',pl:'2025 Q3'};}
+function C(){const c=g('CC');return c?c():{cur:['2607','2608','2609'],prev:['2507','2508','2509'],cl:'26Q3',pl:'25Q3'};}
 function sum(m,ys){let a=0,q=0;for(const y of ys){const v=m&&m[y];if(v){a+=v[0];q+=v[1]||0;}}return [a,q];}
 function setView(v){R.view=v;try{sessionStorage.setItem('r11_hmv',v);}catch(e){}rr();}
 function rr(){const r=window.render;if(typeof r==='function')r();}
