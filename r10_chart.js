@@ -28,7 +28,7 @@ function goR(o){o=Object.assign({},o);let ax=o.ax;delete o.ax;const nx={};KEYS.f
 
 // ---------- 값 ----------
 const A=()=>amtMode();
-function met(m){const x=cmpM(m),C=CC(),a=A();return {x,p:a?x.ap:x.rp,c:a?x.ac:x.rc,d:a?x.d:x.pp,r:x.r,nd:x.nd,pa:x.pa/C.prev.length,ca:x.ca/C.cur.length};}
+function met(m,zeroPrev){const x=cmpM(m,undefined,undefined,zeroPrev),C=CC(),a=A();return {x,p:a?x.ap:x.rp,c:a?x.ac:x.rc,d:a?x.d:x.pp,r:x.r,nd:x.nd,pa:x.pa/C.prev.length,ca:x.ca/C.cur.length};}
 const wS=v=>{const a=Math.abs(v),s=v<0?'-':'';return a>=1e8?s+(a/1e8).toFixed(1).replace(/\.0$/,'')+'억':a>=1e4?s+f(a/1e4)+'만':s+f(a);};
 const vChart=v=>v==null?(A()?'-':'매출 아직 없음'):A()?man(v):v.toFixed(2)+'%';
 const dTx=r=>r.nd?ND:r.d==null?(A()?'-':'-'):A()?manS(r.d)+(r.r!=null?` (${r.r>=0?'+':''}${r.r.toFixed(1)}%)`:''):ppS(r.d);
@@ -39,7 +39,7 @@ const openK=key=>st.open.has('r10m-'+key);
 const merge=L=>{const o={};L.forEach(m=>Object.entries(m||{}).forEach(([y,v])=>o[y]=(o[y]||0)+v));return o;};
 
 // 이름·월별 금액 목록 → 줄(이번 기간 금액 순) + 원장 외 차이(total 이 있으면: total - 목록 합, 달마다)
-function rowsOf(list,total,residName){const R=list.map(o=>Object.assign({},o,met(o.m))).filter(r=>r.x.ca||r.x.pa).sort((a,b)=>b.ca-a.ca||b.pa-a.pa);
+function rowsOf(list,total,residName,zeroPrev){const R=list.map(o=>Object.assign({},o,met(o.m,zeroPrev))).filter(r=>r.x.ca||r.x.pa).sort((a,b)=>b.ca-a.ca||b.pa-a.pa);
  let resid=null;if(total){const dm={};Object.keys(total).forEach(y=>{dm[y]=total[y]-list.reduce((a,o)=>a+(o.m&&o.m[y]!=null?o.m[y]:0),0);});
   const x=met(dm);if(Math.abs(x.x.ca)>=1||Math.abs(x.x.pa)>=1)resid=Object.assign({key:'__resid',name:residName,m:dm,resid:true},x);}
  return {R,resid};}
@@ -148,8 +148,8 @@ function monthlyQ(mq){const C=CC();return sumM(mq||{},C.cur)[1]/C.cur.length;}
 function vendCompare(key){const C=CC();const L=(HM.mats||[]).filter(x=>x.item===key).map(x=>{const [ca,cq]=sumM(x.m,C.cur),[pa,pq]=sumM(x.m,C.prev);return {name:(HM.vname||{})[x.vendor]||M2.vn[x.vendor]||x.vendor,q:cq/C.cur.length,cu:cq>0?ca/cq:null,pu:pq>0&&pa>0?pa/pq:null,ca};}).filter(r=>r.ca>0||r.q>0).sort((a,b)=>b.ca-a.ca).slice(0,6);
  if(!L.length)return '';return `<table class="r10-vc"><caption>공급 거래처 · 월 구매 수량 · 단가 비교</caption><thead><tr><th>거래처</th><th class="num">월 수량</th><th class="num">${esc(C.cl)} 단가</th><th class="num">${esc(C.pl)} 단가</th></tr></thead><tbody>${L.map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${f(r.q)}</td><td class="num">${r.cu==null?'-':f(r.cu)+'원'}</td><td class="num">${r.pu==null?'신규':f(r.pu)+'원'}</td></tr>`).join('')}</tbody></table>`;}
 const hmVal=(r)=>HM.price?r.pchg:r.achg;
-const hmTxt=r=>{const v=hmVal(r);return v==null?(HM.price?'신규·비교 구매 없음':ND):pctS(v);};
-function hmTip(r){const C=CC();const u=r.pchg!=null?`단가 등락 ${pctS(r.pchg)}`:'단가 등락 계산 안 함(신규 품목: 비교 기간에 같은 품목 구매 없음)';const a=r.achg!=null?`금액 등락(월평균) ${pctS(r.achg)}`:`금액 ${ND}`;
+const hmTxt=r=>{const v=hmVal(r);return v==null?(HM.price?'신규·비교 구매 없음':r.nd?ND:manS(r.r.x.d)):pctS(v);};
+function hmTip(r){const C=CC();const u=r.pchg!=null?`단가 등락 ${pctS(r.pchg)}`:'단가 등락 계산 안 함(신규 품목: 비교 기간에 같은 품목 구매 없음)';const a=r.achg!=null?`금액 등락(월평균) ${pctS(r.achg)}`:r.nd?`금액 ${ND}`:`${C.pl} 월평균 ${f(r.r.x.ap)}원 · 금액 증감(월평균) ${manS(r.r.x.d)}`;
  const cv=r.cov!=null&&r.pchg!=null&&r.cov<0.995?` · 단가 등락은 전기 가격이 있는 품목 ${(r.cov*100).toFixed(0)}% 기준`:'';const lk=r.link===''&&HM.mapNote?' · 미분류(계정 연결 없음)':r.link&&r.link!=='5029'?` · ${r.link} 계정 연결`:'';
  return `${r.name} · ${C.cl} 총 금액 ${f(r.size)}원 · ${u}${cv} · ${a}${lk}`;}
 function hmCells(el){const C=CC();const all=HM.rows;const lim=HM.open?HMMAX:HMTOP;const top=all.slice(0,lim),rest=all.slice(lim);
@@ -158,17 +158,21 @@ function hmCells(el){const C=CC();const all=HM.rows;const lim=HM.open?HMMAX:HMTO
  el.innerHTML=S.map(b=>{const w=Math.max(0,b.w),h=Math.max(0,b.h);const pos=`left:${b.x}px;top:${b.y}px;width:${w}px;height:${h}px`;
   if(b.it.rest)return `<button type="button" class="r10-hc rest" style="${pos}" data-r10hmore="1" aria-expanded="false" title="${esc(`기타 ${b.it.rest}${HM.unitName} · ${C.cl} 총 금액 ${f(b.it.v)}원 · 누르면 펼쳐요`)}" data-amt="${b.it.v}"><span class="n">기타 ${b.it.rest}${HM.unitName}</span><span class="c">눌러서 펼치기 ⌄</span></button>`;
   const r=b.it.r;const k=B(hmVal(r));const lab=w>=70&&h>=40&&w*h>=4500,big=w>=180&&h>=100;
-  return `<button type="button" class="r10-hc bk-${k}${HM.sel===r.key?' sel':''}" data-r10hc="${esc(r.key)}"${lab?'':' data-nolabel="1"'} data-amt="${r.size}" data-chg="${r.pchg==null?'':r.pchg.toFixed(3)}" data-achg="${r.achg==null?'':r.achg.toFixed(3)}" aria-pressed="${HM.sel===r.key}" aria-label="${esc(hmTip(r))} · 누르면 아래에 추세가 나와요" title="${esc(hmTip(r))}" style="${pos};background:${BKC[k]};color:${fg(k)}">${lab?`<span class="n">${esc(r.name)}</span>${hmVal(r)==null?(big?'<span class="c why">신규 품목 · 비교 단가 없음</span>':''):`<span class="c num">${hmTxt(r)}</span>`}`:''}</button>`;}).join('');
+  return `<button type="button" class="r10-hc bk-${k}${HM.sel===r.key?' sel':''}" data-r10hc="${esc(r.key)}"${lab?'':' data-nolabel="1"'} data-amt="${r.size}" data-chg="${r.pchg==null?'':r.pchg.toFixed(3)}" data-achg="${r.achg==null?'':r.achg.toFixed(3)}" aria-pressed="${HM.sel===r.key}" aria-label="${esc(hmTip(r))} · 누르면 아래에 추세가 나와요" title="${esc(hmTip(r))}" style="${pos};background:${BKC[k]};color:${fg(k)}">${lab?`<span class="n">${esc(r.name)}</span>${hmVal(r)==null&&HM.price?(big?'<span class="c why">신규 품목 · 비교 단가 없음</span>':''):`<span class="c num">${hmTxt(r)}</span>`}`:''}</button>`;}).join('');
  const bar=document.getElementById('r10HmBar');if(bar)bar.innerHTML=HM.open&&all.length>HMTOP?'<button type="button" class="r10-hless" data-r10hmore="1" aria-expanded="true">상위 '+HMTOP+'개만 보기 ⌃</button>':'';
  el.dataset.drawn=String(W);return true;}
 function drawHm(force){const el=document.getElementById('r10HmMap');if(!el)return;if(!force&&el.dataset.drawn)return;hmCells(el);}
 function trendHtml(){const r=HM.rows.find(x=>x.key===HM.sel);
  if(!r)return `<div class="r10-trend empty" id="r10Trend"><div class="r10-trh">칸을 누르면 여기에 월별 추세가 한 개 나와요</div></div>`;
+ const C=CC(),x=r.r.x;
+ const compare=HM.kind==='vend'&&st.div==='online'?`<section id="r10VendorCompare" aria-label="선택 거래처 ${esc(r.name)} 비교"><div class="r10-st2">선택 거래처 ${esc(r.name)} 비교</div>
+  <div class="r10-sum"><span class="r10-sk">월평균 금액</span><span class="r10-sv num">${C.pl} ${x.nd?ND:f(x.ap)+'원'}</span><span class="r10-sv num">${C.cl} ${f(x.ac)}원</span><span class="r10-sd num">증감 ${x.nd?ND:(x.d>0?'+':'')+f(x.d)+'원'}</span></div>
+  ${A()?'':`<div class="r10-sum"><span class="r10-sk">${OBL} 기준 비율</span><span class="r10-sv num">${C.pl} ${x.nd?ND:x.rp==null?'매출 자료 없음':x.rp.toFixed(2)+'%'}</span><span class="r10-sv num">${C.cl} ${x.rc==null?'매출 자료 없음':x.rc.toFixed(2)+'%'}</span><span class="r10-sd num">증감 ${x.nd?ND:x.pp==null?'매출 자료 없음':ppS(x.pp)}</span></div>`}</section>`:'';
  const pOk=!!r.pser;const mode=pOk&&HM.tr==='price'?'price':'amt';const price=mode==='price';
  const M=monthChart(price?r.pser:r.m,{price,amt:true,none:'구매 없음',title:r.name+(price?' 월별 단가':' 월별 금액')});
  const why=pOk?'':`<span class="r10-trw">단가는 볼 수 없어요 · ${HM.kind==='vend'?'이 거래처는 품목이 여러 개라 단가가 하나로 정해지지 않아요':'수량 자료가 없어요'}</span>`;
  const go=HM.kind==='item'&&M2I[r.key]?`<button type="button" class="r10-link" data-r10sel="p:${esc(r.key)}">단가 상세 ›</button>`:'';
- return `<div class="r10-trend" id="r10Trend" data-key="${esc(r.key)}" data-mode="${mode}"><div class="r10-trh"><span class="r10-trn">${esc(r.name)}</span><span class="r10-ss">${price?`월별 단가(원${r.unit?' / '+esc(r.unit):''} · 금액 ÷ 수량)`:'월별 금액(원)'}</span>
+ return `<div class="r10-trend" id="r10Trend" data-key="${esc(r.key)}" data-mode="${mode}">${compare}<div class="r10-trh"><span class="r10-trn">${esc(r.name)}</span><span class="r10-ss">${price?`월별 단가(원${r.unit?' / '+esc(r.unit):''} · 금액 ÷ 수량)`:'월별 금액(원)'}</span>
   <span class="r10-trs" role="group" aria-label="추세 보기"><button type="button" data-r10tr="price" class="${price?'on':''}" aria-pressed="${price}"${pOk?'':' disabled'}>단가</button><button type="button" data-r10tr="amt" class="${price?'':'on'}" aria-pressed="${!price}">금액</button></span>${go}</div>${why}${M.chart}<div class="r10-leg">${M.legend}</div>${HM.kind==='item'?vendCompare(r.key):''}</div>`;}
 function refreshTrend(){const el=document.getElementById('r10Trend');if(el)el.outerHTML=trendHtml();
  document.querySelectorAll('#r10HmMap [data-r10hc]').forEach(b=>{const on=b.dataset.r10hc===HM.sel;b.classList.toggle('sel',on);b.setAttribute('aria-pressed',String(on));});}
@@ -179,7 +183,7 @@ function hmCard(R,resid,t,o,kind){const C=CC();HM.kind=kind;HM.unitName=o.unitNa
  const leg=`<span class="r10-lh">${sizeTxt}</span>`+B.map(([k,l])=>`<span><i class="${k==='n'?'hatch':''}" style="background:${BKC[k]}"></i>${k==='n'?(HM.price?'빗금 = 신규(비교 단가 없음)':l):l}</span>`).join('');
  const note=(o.note?o.note(resid):'')||'';
  return {sum:sumLine(t),chart:`<div class="r10-hmw" id="r10HmMap" role="group" aria-label="${esc((o.title||'')+' 히트맵 · 칸 크기 = 총 금액 · 색 = '+(HM.price?'단가':'금액')+' 등락')}">${HM.rows.length?'':'<div class="r10-note">그릴 칸이 없어요</div>'}</div><div class="r10-hmbar" id="r10HmBar"></div>`,legend:leg,note:'',unit:`${C.cl} 총 금액(칸 크기) · ${HM.price?'단가':'금액'} 등락(색) · 비교 ${C.pl}`,extra:trendHtml()+(note?`<div class="r10-note" id="r10ChartNote">${note}</div>`:'')+(o.extra?o.extra(R):'')};}
-function vendView(list,total,o){const {R,resid}=rowsOf(list,total,'원장 외 차이');R.forEach(r=>{r.sel=o.selKey&&r.key===o.selKey;});const t=met(total);const un=o.unitName||'곳';
+function vendView(list,total,o){const {R,resid}=rowsOf(list,total,'원장 외 차이',o.zeroPrev);R.forEach(r=>{r.sel=o.selKey&&r.key===o.selKey;});const t=met(total);const un=o.unitName||'곳';
  if(o.hm)return hmCard(R,resid,t,o,'vend');
  const CR=chartRows(R,resid,o.selKey,un,o.key);
  const P=pairChart(CR,{title:o.title,key:o.key,sel:o.sel,selOn:true,selTxt:o.selTxt,sub:r=>[shareTxt(r,t.ca),o.badge?o.badge(r):''].filter(Boolean).join(' · '),more:moreBtn(o.key,R.length,un)});
@@ -189,7 +193,7 @@ function itemView(items,total,o){const R=itemRows(items);const t=met(total);cons
  const P=pairChart(CR,{title:o.title,key,sel:go?priceGo:null,selTxt:'누르면 그 자재 단가 상세로 가요',sub:unitSub,more:moreBtn(key,R.length,'개')});const ps=R.reduce((a,r)=>a+r.ca,0);
  const note=(o.note||'')+' 막대 옆 작은 글 = 그 품목 가중 단가(공급가액 ÷ 수량).'+(o.gl?` 이번 기간 구매현황 합계 월평균 ${f(ps)}원 · 계정 마감 월평균 ${f(t.ca)}원(차이 ${sg(ps-t.ca)}원). 구매현황은 원장 연결 기준이라 계정 합계와 달라요.`:'');
  return {sum:sumLine(t),chart:P.chart,legend:P.legend,note:note.trim()};}
-function allView(m,o){const t=met(m);const M=monthChart(m,{title:o.title});return {sum:sumLine(t),chart:M.chart,legend:M.legend,note:o.note||''};}
+function allView(m,o){const t=met(m,o.zeroPrev);const M=monthChart(m,{title:o.title});return {sum:sumLine(t),chart:M.chart,legend:M.legend,note:o.note||''};}
 // r13 c6(본부장님 보완 3): 거래처 탭이 비는 이유를 쉬운 말로 + 대안(전체 대비 비중). 업체 줄이 있는 계정은 DB 에 모두 적재돼서 여기까지 오는 건 정말 업체 줄이 없는 계정뿐이에요
 function shareAlt(i,online){const ys=CC().cur;if(!ys.length||!i||!i.m)return '';
  const av=m=>ys.reduce((a,y)=>a+(m&&m[y]!=null?(typeof m[y]==='number'?m[y]:m[y][0]):0),0)/ys.length;let tot=0;
@@ -222,7 +226,7 @@ function prodCfg(i){const code=i.code;HM.mapNote=false;if(code==='5029'){const S
  const items=()=>zipm?M2.items.filter(x=>x.g==='ZIP_M').map(x=>({key:x.c,name:x.n,unit:x.u,mq:x.m,m:Object.fromEntries(Object.entries(x.m).map(([y,v])=>[y,v[0]])),vns:Object.keys(x.v).map(c=>M2.vn[c]||c)})):itemsOf(MT,vnProd(code));
  return {title:`${esc(i.title)} 한눈에`,axes:[{id:'all'},{id:'vend',dis:vendDis(V,i)}].concat(st.div==='mgmt'?[]:[{id:'item',dis:iDis}]),views:{/* hq3: 경영지원은 구매현황 품목이 없어 품목별 보기를 숨겨요 */
   all:()=>allView(i.m,{title:i.title}),
-  vend:()=>vendView(V.map(v=>({key:v.code,name:vName(v),m:v.m})),i.m,{key:'vend',hm:true,itemsOf:k=>MT.filter(x=>x.vendor===k),itemAll:mergeByItem(MT),title:i.title+' 거래처별',selKey:st.v,sel:r=>'v:'+r.key,selTxt:'누르면 AI 질문이 그 거래처로 좁혀져요',badge:r=>vNatOf(r.key),
+  vend:()=>vendView(V.map(v=>({key:v.code,name:vName(v),m:v.m})),i.m,{key:'vend',hm:true,zeroPrev:!i.nd&&V.some(v=>hasY(v.m,CC().prev)),itemsOf:k=>MT.filter(x=>x.vendor===k),itemAll:mergeByItem(MT),title:i.title+' 거래처별',selKey:st.v,sel:r=>'v:'+r.key,selTxt:'누르면 AI 질문이 그 거래처로 좁혀져요',badge:r=>vNatOf(r.key),
    note:rs=>`거래처 = ${vSrcNote(code)?'회계집계표·원장':'이카운트 원장'} 업체 · 구성비 = ${CC().cl} 금액 기준.${rs?' 원장 외 차이 = 마감 금액 - 원장 업체 합계라 더하면 전체와 같아요.':''}${V.some(v=>vNatOf(v.code))?' 금융성·보험성 표시는 이름으로 구분한 참고예요(합계에서 빼지 않아요).':''}`,
    extra:()=>{const t=[vSrcNote(code),q4VendNote()].filter(Boolean).join(' ');return t?`<div class="sub r13-src" id="r13VendSrc">${esc(t)}</div>`:'';}}),
   item:()=>itemView(items(),i.m,{mats:MT,key:'item',title:i.title+' 품목별',gl:true,note:zipm?'[추정 연결] 원재료비는 원장 연결 품목이 없어 구매현황 원재료 품목 전체로 보여요.':'품목 = 이 계정 원장 줄에 연결된 구매현황 품목.'})}};}
@@ -233,12 +237,12 @@ function onlineCfg(i){const V=view();const acc=(DB.ovend||[]).find(a=>a.code===O
   all:()=>allView(i.m,{title:i.title}),
   ch:()=>vendView(chs,i.m,{key:'ch',title:i.title+' 채널별',unitName:'개 채널',selKey:cc,sel:r=>'c:'+r.key,selTxt:'누르면 그 채널을 골라요(아래 채널 이동도 그 채널)',
    badge:r=>V.some(l=>l.moved&&l.item===i.title&&(l.eff===r.key||l.ch===r.key))?'이동 반영':'',note:()=>`채널별 수치는 ${V5.basisLabel()} 기준이에요. 채널을 다 더하면 전체와 같아요.`,extra:R=>chGrid(R,cc)}),
-  vend:()=>vendView(OV.map(v=>({key:v.code,name:v.name,m:v.m})),i.m,{key:'vend',hm:true,title:i.title+' 거래처별',
+  vend:()=>vendView(OV.map(v=>({key:v.code,name:v.name,m:v.m})),i.m,{key:'vend',hm:true,zeroPrev:!i.nd&&OV.some(v=>hasY(v.m,CC().prev)),title:i.title+' 거래처별',
    note:rs=>`거래처 = 이카운트 원장(온라인) 업체 · 구성비 = ${CC().cl} 금액 기준.${rs?' 원장 외 차이 = 전체(월 탭 채널 직접비) - 원장 업체 합계라 더하면 전체와 같아요.':''}`})}};}
 function vdCfg(){const {a,v}=vdData();const mats=st.div==='prod'?(PD.mat[a.code]||[]).filter(m=>m.vendor===v.code):[];
  const iDis=st.div==='online'?'품목 아직 없음(구매현황에 온라인 원장과 연결된 품목이 없어요)':mats.length?null:'품목 아직 없음(구매현황에 이 업체와 연결된 품목이 없어요)';
  return {title:`${esc(v.name)} 한눈에`,axes:[{id:'all'}].concat(st.div==='mgmt'?[]:[{id:'item',dis:iDis}]),views:{
-  all:()=>allView(v.m,{title:v.name}),
+  all:()=>allView(v.m,{title:v.name,zeroPrev:a.zeroPrev}),
   item:()=>itemView(itemsOf(mats,()=>v.name),v.m,{mats,key:'item',title:v.name+' 품목별',gl:false,note:`품목 = ${esc(a.name)} 원장 줄에 연결된 구매현황 품목.`})}};}
 function pdCfg(){const it=pItem();const C=CC();const up={};const ms=V5.MONTHS.filter(Boolean);ms.forEach(y=>{const v=it.m[y];if(v&&v[1]>0)up[y]=v[0]/v[1];});
  const c=pchg(it,st.cmp);const ut=it.u?' / '+esc(it.u):'';const fmP=v=>v==null?'-':f(v)+'원';
