@@ -211,3 +211,52 @@ test('repair: spark tooltip turns V5 missing-sales markup into escaped text', ()
   assert.match(html, /title="25\.07 매출 줄 없음"/);
   assert.doesNotMatch(html, /title="[^"]*class=/);
 });
+
+test('production: flow requests the current plan stylesheet with a content cache key', () => {
+  const { createHash } = require('node:crypto');
+  const html = fs.readFileSync(path.join(root, 'flow.html'), 'utf8');
+  const base = 'https://costapp.invalid/cost-app/';
+  const links = [...html.matchAll(/<link\b[^>]*>/g)]
+    .map(([tag]) => Object.fromEntries([...tag.matchAll(/([\w-]+)=["']([^"']*)["']/g)]
+      .map(([, name, value]) => [name, value])))
+    .filter(link => link.rel === 'stylesheet' && new URL(link.href, base).pathname.endsWith('/plan_sidebar.css'));
+  assert.equal(links.length, 1);
+  const url = new URL(links[0].href, base);
+  const version = createHash('sha256').update(fs.readFileSync(path.join(root, 'plan_sidebar.css'))).digest('hex').slice(0, 12);
+  assert.equal(url.searchParams.get('v'), version, 'plan CSS URL must change with its content so cached older CSS cannot mask mobile rules');
+});
+
+test('production: flow loads the current online vendor renderer and preserves zero versus absent history', () => {
+  const { createHash } = require('node:crypto');
+  const html = fs.readFileSync(path.join(root, 'flow.html'), 'utf8');
+  const script = html.match(/<script\b[^>]*src=["']([^"']*r10_chart\.js(?:\?[^"']*)?)["']/);
+  assert.ok(script, 'flow must load the vendor comparison renderer');
+  const url = new URL(script[1], 'https://costapp.invalid/cost-app/');
+  const version = createHash('sha256').update(fs.readFileSync(path.join(root, 'r10_chart.js'))).digest('hex').slice(0, 12);
+  assert.equal(url.searchParams.get('v'), version, 'online vendor renderer must not reuse cached code that marks new vendors incomparable');
+  for (const mode of ['amt', 'ratio']) {
+    const a = app('online', 'q3', mode);
+    a.run("st.a='광고선전비';R10CHART.onlineCfg(cur()).views.vend();R10CHART.HM.sel='NEW'");
+    const render = "R10CHART.onlineCfg(cur()).views.vend().extra";
+    const summary = () => a.run(render).match(/<section id="r10VendorCompare"[\s\S]*?<\/section>/)[0];
+    assert.match(summary(), /25Q3[^<]*0원/);
+    assert.match(summary(), /26Q3[^<]*300원/);
+    assert.match(summary(), /증감[^<]*\+300원/);
+    assert.doesNotMatch(summary(), /비교 기간 없음/);
+    if (mode === 'ratio') {
+      assert.match(summary(), /25Q3[^<]*0\.00%/);
+      assert.match(summary(), /26Q3[^<]*0\.50%/);
+    }
+    for (const missing of ['account', 'vendor']) {
+      const b = app('online', 'q3', mode);
+      b.run("st.a='광고선전비'");
+      b.run(missing === 'account'
+        ? "OL.lines=OL.lines.filter(r=>!r.ym.startsWith('25'))"
+        : "DB.ovend[0].vend=DB.ovend[0].vend.filter(v=>v.code==='NEW')");
+      b.run("R10CHART.onlineCfg(cur()).views.vend();R10CHART.HM.sel='NEW'");
+      const absent = b.run(render).match(/<section id="r10VendorCompare"[\s\S]*?<\/section>/)[0];
+      assert.match(absent, /25Q3[^<]*비교 기간 없음/);
+      assert.doesNotMatch(absent, /25Q3[^<]*0원/);
+    }
+  }
+});
