@@ -107,7 +107,7 @@
       if (memo.allowedP) return memo.allowedP;
       var pr = Promise.all(DIVS.map(function (d) {
         return sheets.titles(sid(d)).then(function (t) { return { d: d, t: t }; }, function (e) {
-          if (e && (e.status === 403 || e.status === 404)) return null;   // 공유받지 못한 본부 = 권한 없음
+          if (e && (e.status === 403 || e.status === 404)) { (window.R9_DENY = window.R9_DENY || []).push(d + ':' + e.status + ':' + String(e.message || '').slice(0, 80)); return null; }   // 공유받지 못한 본부 = 권한 없음
           throw e;                                                       // 일시 오류(429·5xx·네트워크)는 권한 없음으로 보지 않는다
         });
       })).then(function (r) { var a = [], titles = {}; r.forEach(function (x) { if (x) { a.push(x.d); titles[x.d] = x.t; } }); memo.titles = titles; return a.sort(); });
