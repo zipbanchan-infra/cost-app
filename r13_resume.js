@@ -6,7 +6,8 @@ const who=me=>String((me&&(me.user&&me.user.email||me.user))||'');
 const WEEK=7*864e5;
 window.R13_resumeHash=function(me){   // 주소에 화면 위치가 없을 때만(로그인을 거치면 주소 #… 가 사라져요) 마지막 위치로
  try{const v=JSON.parse(localStorage.getItem(KEY(who(me)))||'null');
-  if((!location.hash||location.hash==='#')&&v&&v.h&&Date.now()-v.t<WEEK){history.replaceState(null,'','#'+v.h);window.R13_RESTORED=true;}}catch(e){}
+  const dv=v&&v.h?new URLSearchParams(v.h).get('div'):null,al=(me&&me.allowed_divisions)||[],dok=!dv||al.includes({prod:'PROD',online:'ONLINE',mgmt:'MGMT'}[dv]||'PROD');
+  if((!location.hash||location.hash==='#')&&v&&v.h&&dok&&Date.now()-v.t<WEEK){history.replaceState(null,'','#'+v.h);window.R13_RESTORED=true;}}catch(e){}
  const save=()=>{try{const h=location.hash.slice(1);if(h)localStorage.setItem(KEY(who(me)),JSON.stringify({h,t:Date.now()}));}catch(e){}};
  window.addEventListener('hashchange',save);window.addEventListener('pagehide',save);save();};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
