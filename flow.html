@@ -9,9 +9,11 @@
 (async()=>{const q=new URLSearchParams(location.search);if(q.get('as'))localStorage.setItem('r6_dev_user',q.get('as'));
  const boot=document.getElementById('boot');
  try{const me=await V5.api('/api/me');const [data,state]=await Promise.all([V5.api('/api/r6/data'),V5.api('/api/state')]);
-  window.R6_DATA=data;V5.initState(state,me);window.R13_resumeHash&&R13_resumeHash(me);const s=document.createElement('script');s.src='app.js';s.onload=()=>{if(window.R10HOOK)R10HOOK();};document.body.appendChild(s);}
+  window.R6_DATA=data;V5.initState(state,me);window.R13_resumeHash&&R13_resumeHash(me);const s=document.createElement('script');s.src='app.js?v=1118div';s.onload=()=>{if(window.R10HOOK)R10HOOK();};document.body.appendChild(s);}
  catch(e){window.R6_READY='error';// U5: 권한 없음(403)은 그대로 #denied, 나머지는 해요체 안내 + 다시 불러오기(서버 원문 e.message 는 안 보여요)
-  if(e.status===403&&(!e.code||e.code==='not_allowlisted')){boot.id='denied';boot.textContent='이 계정은 비용관리를 볼 권한이 없어요. 경영지원본부에 권한을 요청해 주세요.'+(window.R9_DENY&&R9_DENY.length?' (확인용: '+R9_DENY.join(' / ')+')':'');return;}
+  if(e.status===403&&(!e.code||e.code==='not_allowlisted')){const nm={prod:'생산본부',online:'온라인본부',mgmt:'경영지원본부'};const dv=(new URLSearchParams(location.hash.slice(1)).get('div'))||'prod';const cur=nm[dv]?dv:'prod';
+   boot.id='denied';boot.style.padding='0';boot.innerHTML='<div class="topbar"><div class="tabs">'+Object.keys(nm).map(k=>'<button class="tab dis'+(k===cur?' on':'')+'" data-div="'+k+'">'+nm[k]+'</button>').join('')+'</div></div><div style="padding:48px;font-size:15px;color:#616161">'+nm[cur]+' 페이지는 권한이 없어요. 경영지원본부에 권한을 요청해 주세요.'+(window.R9_DENY&&R9_DENY.length?' (확인용: '+R9_DENY.join(' / ')+')':'')+'</div>';
+   boot.querySelectorAll('[data-div]').forEach(b=>b.onclick=()=>{location.hash='div='+b.dataset.div;location.reload();});return;}
   boot.id='bootErr';boot.innerHTML=V5.errHtml(V5.errInfo(e,'화면을 불러오지 못했어요',{403:'이 계정으로는 이 화면 자료를 볼 수 없어요. 경영지원본부에 권한을 요청해 주세요.',404:'화면 자료 주소를 찾지 못했어요. 잠시 뒤 다시 불러와 주세요.'}))+'<button class="btn pri sm" id="bootRetry" style="margin-top:12px">다시 불러오기</button>';
   document.getElementById('bootRetry').onclick=()=>location.reload();}})();
 </script></body></html>
