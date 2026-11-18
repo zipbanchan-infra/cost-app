@@ -260,3 +260,38 @@ test('production: flow loads the current online vendor renderer and preserves ze
     }
   }
 });
+
+test('A1-LABEL: six incomparable MGMT vendors keep visible tile names and status', () => {
+  const vendors = [
+    ['BLANK', '거래처 미기재', 45000],
+    ['V0030', '주식회사 지에스리테일 화성물류센터', 34629],
+    ['V0028', '(주)지에스네트웍스_영남연계', 28357],
+    ['V0031', '(주)지에스리테일 남사물류센터', 26510],
+    ['V0032', '(주)지에스리테일 부산물류센터', 5556],
+    ['V0029', '(주)지에스리테일 양산 물류센터', 4976]
+  ].map(([code, name, amount]) => ({ code, name, m: { '2607': amount } }));
+  for (const mode of ['amt', 'ratio']) {
+    const a = app('mgmt', 'q3', mode);
+    vm.runInContext(chartSource.replace('window.R10CHART={HM,', 'window.R10CHART={hmCells,HM,'), a.context);
+    a.context.labelVendors = structuredClone(vendors);
+    a.run("PD.acc.push({code:'8379',name:'운반비',m:{'2607':145028}});PD.vend['8379']=labelVendors;st.a='8379'");
+    const before = JSON.stringify(a.context.R6_DATA);
+    a.run('R10CHART.prodCfg(cur()).views.vend()');
+    for (const width of [319, 920]) {
+      const el = { clientWidth: width, innerHTML: '', dataset: {}, style: {} };
+      a.context.document.getElementById = () => null;
+      assert.equal(a.context.R10CHART.hmCells(el), true);
+      const tiles = [...el.innerHTML.matchAll(/<button\b[^>]*data-r10hc="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g)];
+      assert.equal(tiles.length, 6);
+      for (const vendor of vendors) {
+        const tile = tiles.find(([, key]) => key === vendor.code);
+        assert.ok(tile, vendor.name);
+        assert.match(tile[2], /<span class="n"[^>]*>[^<]+<\/span>/);
+        assert.ok(tile[2].includes(vendor.name), vendor.name + ' must be visible inside its tile');
+        assert.match(tile[2], /비교 기간 없음/);
+      }
+      assert.ok(a.context.R10CHART.HM.rows.every(r => r.nd && r.r.x.ap === null));
+    }
+    assert.equal(JSON.stringify(a.context.R6_DATA), before);
+  }
+});

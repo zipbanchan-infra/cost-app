@@ -154,11 +154,14 @@ function hmTip(r){const C=CC();const u=r.pchg!=null?`단가 등락 ${pctS(r.pchg
  return `${r.name} · ${C.cl} 총 금액 ${f(r.size)}원 · ${u}${cv} · ${a}${lk}`;}
 function hmCells(el){const C=CC();const all=HM.rows;const lim=HM.open?HMMAX:HMTOP;const top=all.slice(0,lim),rest=all.slice(lim);
  const its=top.map(r=>({v:r.size,r}));const rs=rest.reduce((a,r)=>a+r.size,0);if(rs>0)its.push({v:rs,rest:rest.length});
- const W=el.clientWidth;if(!(W>0))return false;const S=squarify(its,0,0,W,HMH);const B=bucket;
- el.innerHTML=S.map(b=>{const w=Math.max(0,b.w),h=Math.max(0,b.h);const pos=`left:${b.x}px;top:${b.y}px;width:${w}px;height:${h}px`;
+ const W=el.clientWidth;if(!(W>0))return false;let S=squarify(its,0,0,W,HMH);const B=bucket;
+ const labelAll=HM.kind==='vend'&&all.length>0&&all.every(r=>r.nd)&&S.some(b=>b.it.r&&(b.w<70||b.h<40||b.w*b.h<4500));
+ const height=labelAll&&W<480?600:HMH;el.style.height=height+'px';if(height!==HMH)S=squarify(its,0,0,W,height);
+ el.innerHTML=S.map(b=>{const w=Math.max(0,b.w),h=Math.max(0,b.h),compact=labelAll&&(w<120||h<100);const pos=`left:${b.x}px;top:${b.y}px;width:${w}px;height:${h}px${compact?';padding:2px':''}`;
   if(b.it.rest)return `<button type="button" class="r10-hc rest" style="${pos}" data-r10hmore="1" aria-expanded="false" title="${esc(`기타 ${b.it.rest}${HM.unitName} · ${C.cl} 총 금액 ${f(b.it.v)}원 · 누르면 펼쳐요`)}" data-amt="${b.it.v}"><span class="n">기타 ${b.it.rest}${HM.unitName}</span><span class="c">눌러서 펼치기 ⌄</span></button>`;
-  const r=b.it.r;const k=B(hmVal(r));const lab=w>=70&&h>=40&&w*h>=4500,big=w>=180&&h>=100;
-  return `<button type="button" class="r10-hc bk-${k}${HM.sel===r.key?' sel':''}" data-r10hc="${esc(r.key)}"${lab?'':' data-nolabel="1"'} data-amt="${r.size}" data-chg="${r.pchg==null?'':r.pchg.toFixed(3)}" data-achg="${r.achg==null?'':r.achg.toFixed(3)}" aria-pressed="${HM.sel===r.key}" aria-label="${esc(hmTip(r))} · 누르면 아래에 추세가 나와요" title="${esc(hmTip(r))}" style="${pos};background:${BKC[k]};color:${fg(k)}">${lab?`<span class="n">${esc(r.name)}</span>${hmVal(r)==null&&HM.price?(big?'<span class="c why">신규 품목 · 비교 단가 없음</span>':''):`<span class="c num">${hmTxt(r)}</span>`}`:''}</button>`;}).join('');
+  const r=b.it.r;const k=B(hmVal(r));const lab=labelAll||(w>=70&&h>=40&&w*h>=4500),big=w>=180&&h>=100;
+  const labelStyle=compact?' style="font-size:12px;line-height:16px;white-space:normal;overflow-wrap:anywhere;flex-shrink:0"':'';
+  return `<button type="button" class="r10-hc bk-${k}${HM.sel===r.key?' sel':''}" data-r10hc="${esc(r.key)}"${lab?'':' data-nolabel="1"'} data-amt="${r.size}" data-chg="${r.pchg==null?'':r.pchg.toFixed(3)}" data-achg="${r.achg==null?'':r.achg.toFixed(3)}" aria-pressed="${HM.sel===r.key}" aria-label="${esc(hmTip(r))} · 누르면 아래에 추세가 나와요" title="${esc(hmTip(r))}" style="${pos};background:${BKC[k]};color:${fg(k)}">${lab?`<span class="n"${labelStyle}>${esc(r.name)}</span>${hmVal(r)==null&&HM.price?(big?'<span class="c why">신규 품목 · 비교 단가 없음</span>':''):`<span class="c num"${labelStyle}>${hmTxt(r)}</span>`}`:''}</button>`;}).join('');
  const bar=document.getElementById('r10HmBar');if(bar)bar.innerHTML=HM.open&&all.length>HMTOP?'<button type="button" class="r10-hless" data-r10hmore="1" aria-expanded="true">상위 '+HMTOP+'개만 보기 ⌃</button>':'';
  el.dataset.drawn=String(W);return true;}
 function drawHm(force){const el=document.getElementById('r10HmMap');if(!el)return;if(!force&&el.dataset.drawn)return;hmCells(el);}
